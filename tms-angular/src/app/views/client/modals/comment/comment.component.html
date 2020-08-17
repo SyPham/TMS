@@ -1,0 +1,96 @@
+<div class="modal-header">
+  <h4 class="modal-title">
+    {{title}}
+  </h4>
+  
+  <button type="button" class="close" aria-label="Close" (click)="activeModal.dismiss('Cross click')">
+    <span aria-hidden="true">&times;</span>
+  </button>
+</div>
+<div class="modal-body">
+  <div class="container">
+    <div class="row d-flex align-items-center">
+      <div class="col-md-12 comments-section">
+        <!--====COMMENT AREA START====-->
+        <div class="row">
+          <div class="col-12">
+            <!-- <h2>Comments</h2> -->
+            <div class="comment-form comment-post" >
+              <!-- <ejs-uploader #defaultupload class="ejs-uploader" ></ejs-uploader> -->
+              <i (click)="displayImage()" class="fas fa-camera attachment"></i>
+              <textarea class="comment-area" [(ngModel)]="content" placeholder="Write your comment here"></textarea>
+              <a (click)="addComment()" class="btn comment-btn text-white">Post</a>
+             
+            </div>
+            <input type="file" #attachments multiple name="UploadedFile" (change)="onChangeImageFile($event)" class="d-none"
+          accept="image/*" id="image-file-comment" />
+          
+          </div>
+        </div>
+        <div class="row">
+          <div class="col-12 imageList">
+            <div class="image-preview" *ngIf="showImageList">
+              <div *ngFor="let item of urls; let index=index" class="img-content">
+                <img [src]="item" class="img-thumbnail" alt="your image" />
+                <i class="fa fa-times fa-close" (click)="removeSelectedFile(index)"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- =======COMMENTS START=======-->
+        <div class="row" id='commentStart'>
+          <div *ngIf="pin" id='pin' [class]="pin.Images.length > 0 ? 'comment-box-wrapper pin-image' : 'comment-box-wrapper pin'">
+              <div class="comment-box" id='pin-box'>
+                <ejs-contextmenu #contextmenu target='#pin-box' (select)="select($event, pin)" [items]='menuItems' (beforeItemRender)='addDisabled($event)' (created)='onCreated()'></ejs-contextmenu>
+                <img [src]="imageBase64(pin.ImageBase64)" class="commenter-image" alt="commenter_image" />
+                <div class="comment-content" style="background: transparent;">
+                  <div class="commenter-head">
+                    <span class="commenter-name">
+                      <a href>{{pin.Username}}</a>
+                    </span>
+                    <span class="comment-date">
+                      <i class="far fa-clock"></i>
+                      {{datetime(pin.CreatedTime)}} 
+                    </span>
+                  </div>
+                  <div class="comment-body">
+                    <span *ngIf="pin.Images.length > 0" class="comment"> 
+                      <ngx-gallery [options]="galleryOptions" [images]="renderGalleryImages(pin)"></ngx-gallery>
+                      <div style="word-break: break-all;" *ngIf="pin.Content.length > 0">{{pin.Content}}</div>
+                    </span>
+                    <div *ngIf="pin.Images.length === 0" style="word-wrap: break-word;" class="comment">{{pin.Content}}</div>
+                  </div>
+                </div>
+                <div class="pin-button">
+                  <i class="fa fa-thumbtack"></i>
+                </div>
+              </div>
+              <div class="comment-box search pb-2" *ngIf="isShow === true">
+                <img [src]="imageBase64CurrentUser()" class="commenter-image" alt="commenter_image" />
+                <input
+                  class="form-control ml-1 mt-1 form-control-sm"
+                  type="text"
+                  (keyup.enter)="savePin()"
+                  [(ngModel)]="pin.Content"
+                  placeholder="Type a comment"
+                />
+              </div>
+          </div>
+          <div class="col-12">
+          
+          <ng-container *ngFor="let item of dataComment; let i = index">
+                <app-tree [treeData]="item" *ngIf="i < totalShow;" [clientRouter]='clientRouter' [taskID]="taskID"></app-tree>
+              </ng-container>
+            <small style="cursor: pointer;" (click)="increseTotalShow()"
+            *ngIf="totalShow < dataComment?.length" class="text-center text-primary d-block">
+            See more 
+            <i class="fas fa-chevron-down text-small"></i>
+          </small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-footer justify-content-between">
+    <button type="button" class="btn btn-outline-dark" (click)="activeModal.close('Close click')">Close</button>
+  </div>

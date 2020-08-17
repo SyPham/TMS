@@ -1,0 +1,110 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Migrations\20200207071504_Version1.0.7.cs" />
+    <Compile Remove="Migrations\20200207071504_Version1.0.7.Designer.cs" />
+    <Compile Remove="Migrations\20200207071845_Version1.0.7.cs" />
+    <Compile Remove="Migrations\20200207071845_Version1.0.7.Designer.cs" />
+    <Compile Remove="Migrations\20200207073433_Version1.0.8.cs" />
+    <Compile Remove="Migrations\20200207073433_Version1.0.8.Designer.cs" />
+    <Compile Remove="Migrations\20200207073906_Version1.0.8.cs" />
+    <Compile Remove="Migrations\20200207073906_Version1.0.8.Designer.cs" />
+    <Compile Remove="Migrations\20200207074039_Version1.0.8.cs" />
+    <Compile Remove="Migrations\20200207074039_Version1.0.8.Designer.cs" />
+    <Compile Remove="Migrations\20200212032451_version1.1.4.cs" />
+    <Compile Remove="Migrations\20200212032451_version1.1.4.Designer.cs" />
+    <Compile Remove="Migrations\20200218021652_version2.0.2.cs" />
+    <Compile Remove="Migrations\20200218021652_version2.0.2.Designer.cs" />
+    <Compile Remove="Migrations\20200422025435_update6.0.0.cs" />
+    <Compile Remove="Migrations\20200422025435_update6.0.0.Designer.cs" />
+    <Compile Remove="Migrations\20200506065342_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506065342_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506065931_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506065931_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506070245_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506070245_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506070521_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506070521_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506073103_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506073103_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506080333_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506080333_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506081023_UpdateAddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506081023_UpdateAddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506081330_UpdateAddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506081330_UpdateAddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506081617_UpdateAddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506081617_UpdateAddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506081857_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506081857_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506081959_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506081959_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506082630_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506082630_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506082843_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506082843_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506083403_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506083403_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200506084505_AddForeignKeyForTables.cs" />
+    <Compile Remove="Migrations\20200506084505_AddForeignKeyForTables.Designer.cs" />
+    <Compile Remove="Migrations\20200507010825_AddForeignKeyForTables1.0.2.cs" />
+    <Compile Remove="Migrations\20200507010825_AddForeignKeyForTables1.0.2.Designer.cs" />
+    <Compile Remove="Migrations\20200507011042_AddForeignKeyForTables1.0.2.cs" />
+    <Compile Remove="Migrations\20200507011042_AddForeignKeyForTables1.0.2.Designer.cs" />
+    <Compile Remove="Migrations\20200507012351_AddForeignKeyForTables1.0.3.cs" />
+    <Compile Remove="Migrations\20200507012351_AddForeignKeyForTables1.0.3.Designer.cs" />
+    <Compile Remove="Migrations\20200507013256_AddForeignKeyForTables1.0.4.cs" />
+    <Compile Remove="Migrations\20200507013256_AddForeignKeyForTables1.0.4.Designer.cs" />
+    <Compile Remove="Migrations\20200507013336_AddForeignKeyForTables1.0.4.cs" />
+    <Compile Remove="Migrations\20200507013336_AddForeignKeyForTables1.0.4.Designer.cs" />
+    <Compile Remove="Migrations\20200507020218_InitialDb.cs" />
+    <Compile Remove="Migrations\20200507020218_InitialDb.Designer.cs" />
+    <Compile Remove="Migrations\20200507021237_InitialDb.cs" />
+    <Compile Remove="Migrations\20200507021237_InitialDb.Designer.cs" />
+    <Compile Remove="Migrations\20200508090423_version1.0.5.cs" />
+    <Compile Remove="Migrations\20200508090423_version1.0.5.Designer.cs" />
+    <Compile Remove="Migrations\20200508090759_version1.0.5.cs" />
+    <Compile Remove="Migrations\20200508090759_version1.0.5.Designer.cs" />
+    <Compile Remove="Migrations\20200508091224_version1.0.5.cs" />
+    <Compile Remove="Migrations\20200508091224_version1.0.5.Designer.cs" />
+    <Compile Remove="Migrations\20200511031846_version1.0.7.cs" />
+    <Compile Remove="Migrations\20200511031846_version1.0.7.Designer.cs" />
+    <Compile Remove="Migrations\20200511032328_version1.0.7.cs" />
+    <Compile Remove="Migrations\20200511032328_version1.0.7.Designer.cs" />
+    <Compile Remove="Migrations\20200514052914_version1.0.8.cs" />
+    <Compile Remove="Migrations\20200514052914_version1.0.8.Designer.cs" />
+    <Compile Remove="Migrations\20200514052951_version1.0.8.cs" />
+    <Compile Remove="Migrations\20200514052951_version1.0.8.Designer.cs" />
+    <Compile Remove="Migrations\20200514053037_version1.0.8.cs" />
+    <Compile Remove="Migrations\20200514053037_version1.0.8.Designer.cs" />
+    <Compile Remove="Migrations\20200519151259_version1.1.3.cs" />
+    <Compile Remove="Migrations\20200519151259_version1.1.3.Designer.cs" />
+    <Compile Remove="Migrations\20200519151955_version1.1.3.cs" />
+    <Compile Remove="Migrations\20200519151955_version1.1.3.Designer.cs" />
+    <Compile Remove="Migrations\20200526091717_Update1.1.5.cs" />
+    <Compile Remove="Migrations\20200526091717_Update1.1.5.Designer.cs" />
+    <Compile Remove="Migrations\20200527005542_Update1.1.7.cs" />
+    <Compile Remove="Migrations\20200527005542_Update1.1.7.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Http.Features" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="3.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.1.1">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.1.1" />
+  </ItemGroup>
+
+</Project>

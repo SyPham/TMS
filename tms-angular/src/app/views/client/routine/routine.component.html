@@ -1,0 +1,54 @@
+<div class="row">
+  <div class="col-md-3">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-project-diagram"></i> Organization Chart
+        </h3>
+      </div>
+      <!-- /.card-header -->
+      <div class="card-body table-responsive p-0">
+        <ejs-treegrid #treegrid [dataSource]="ocs" [treeColumnIndex]='1' allowPaging='true' allowSorting='true'
+          gridLines='Both' [toolbar]='toolbarOptions' childMapping="children" (rowSelected)="rowSelected($event)">
+          <e-columns>
+            <e-column field="levelnumber" width="80" textAlign="Center" headerText="Level"></e-column>
+            <e-column field="title" headerText="OC Name"></e-column>
+          </e-columns>
+        </ejs-treegrid>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+  <div class="col-md-9">
+    <div class="card">
+      <div class="card-header">
+        <h3 class="card-title"><i class="fas fa-list"></i> Routine Task</h3>
+      </div>
+      <div [class]="!showTasks?'': 'd-none'">
+        <p class="text-danger text-center">* Note: Please click on a department to display list routine task</p>
+      </div>
+      <!-- /.card-header -->
+      <div [class]="showTasks?'card-body table-responsive p-0':'d-none'">
+        <ejs-treegrid #treegridTasks [dataSource]='tasks' childMapping='ChildNodes' [treeColumnIndex]='1'
+          [pageSettings]='pageSetting' [filterSettings]='filterSettings' [contextMenuItems]='contextMenuItems'
+          [toolbar]='toolbarOptionsTasks' allowPaging='true' [allowExcelExport]='true' [allowPdfExport]='true'
+          gridLines='Both' [allowResizing]='true' showColumnMenu='true' allowSorting='true' allowFiltering='true'
+          (toolbarClick)='toolbarClick($event)' 
+          [searchSettings]='searchSettings' 
+          (contextMenuClick)="contextMenuClick($event)"  
+          (recordDoubleClick)="recordDoubleClick($event)"
+          (contextMenuOpen)='contextMenuOpen($event)'>
+          <e-columns>
+            <e-column field="JobName" headerText="Task Name" textAlign="Left" width="240"> </e-column>
+            <e-column field="From" headerText="From"></e-column>
+            <e-column field="Detail" headerText="Detail" width="120">
+            <ng-template #template let-data>
+              <button class="btn btn-sm btn-primary" (click)='openRoutineDetailModal(data)'> <i class="fa fa-info"></i> Detail</button>
+            </ng-template>
+          </e-column>
+          </e-columns>
+        </ejs-treegrid>
+      </div>
+      <!-- /.card-body -->
+    </div>
+  </div>
+</div>
