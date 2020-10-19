@@ -108,7 +108,7 @@
                         style="padding:4px;color:white">{{data.Entity.state}}</span>
                     </ng-template>
                   </e-column>
-                  <e-column field="Entity.DueDate" type='date' format='d MMM, yyyy' clipMode='EllipsisWithTooltip' headerText="Due Date Time" width="200" textAlign="Center">
+                  <e-column field="Entity.DueDate" type='date' format='yyyy/MM/dd hh:mm' clipMode='EllipsisWithTooltip' headerText="Due Date Time" width="200" textAlign="Center">
                   </e-column>
                   <e-column field="Entity.periodType" headerText="Period Type" width="200" textAlign="Center">
                     <ng-template #template let-data>
@@ -116,7 +116,7 @@
                     </ng-template>
                   </e-column>
                   <!-- <e-column field="Entity.ModifyDateTime" headerText="Finished DateTime" width="200" textAlign="Center"></e-column> -->
-                  <e-column field="Entity.CreatedDate" type='date' format='d MMM, yyyy' headerText="Created Date Time" width="200" textAlign="Center"></e-column>
+                  <e-column field="Entity.CreatedDate" type='date' format='yyyy/MM/dd' headerText="Created Date Time" width="200" textAlign="Center"></e-column>
                   <e-column field="Entity.LastComment" headerText="Last Comment" width="200" textAlign="Center"></e-column>
                   <e-column field="Entity.WatchVideo" headerText="Watch Video" width="200"
                     textAlign="Center">

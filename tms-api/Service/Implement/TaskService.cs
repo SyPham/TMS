@@ -406,9 +406,11 @@ namespace Service.Implement
               .Include(x => x.Tags).ThenInclude(x => x.User)
               .Include(x => x.Deputies).ThenInclude(x => x.User)
               .Where(x => x.DueDateTime.Date.CompareTo(DateTime.Now.Date) <= 0 && x.Status == false && x.Tags.Count > 0 && x.DueDateTime.Date.CompareTo(DateTime.MinValue) != 0);
+            
             var userListForHub = new List<int>();
             if (listTasks.Count() == 0)
                 return Tuple.Create(new List<int>(), new List<int>());
+
             var unCompletedTaskList = new List<Data.Models.Task>();
             var currentDate = DateTime.Now.Date;
             foreach (var item in listTasks)
@@ -590,7 +592,7 @@ namespace Service.Implement
                         await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Join(",", listUsers.Distinct()), GetAlertDueDate());
                         await _hubContext.Clients.All.SendAsync("ReceiveMessageForCurd", string.Join(",", listUsers.Distinct()));
                     }
-                    return true;
+                    return item;
 
                 }
                 else //update
@@ -650,12 +652,12 @@ namespace Service.Implement
                         await _hubContext.Clients.All.SendAsync("ReceiveMessageForCurd", string.Join(",", listUsers.Distinct()));
                     }
 
-                    return true;
+                    return edit;
                 }
             }
             catch (Exception ex)
             {
-                return false;
+                return new Data.Models.Task();
             }
         }
         private Data.Models.Task CheckDuedate(Data.Models.Task task, CreateTaskViewModel createTaskView)
@@ -895,6 +897,7 @@ namespace Service.Implement
         {
             var createCode = await _context.Tasks.FindAsync(task.ID);
             createCode.Code = $"{task.ID}-{task.periodType}-{task.JobTypeID}";
+            _context.Tasks.Update(createCode);
             await _context.SaveChangesAsync();
         }
         private object GetAlertDueDate()
@@ -907,7 +910,131 @@ namespace Service.Implement
             }).ToList();
             return list;
         }
-        public async Task<Tuple<bool, string, object>> CreateTask(CreateTaskViewModel task)
+        private async Task<Tuple<bool, string, object>> AddTask(CreateTaskViewModel task)
+        {
+            try
+            {
+                var listUsers = new List<int>();
+
+                var item = _mapper.Map<Data.Models.Task>(task);
+                item.Level = 1;
+                await _context.Tasks.AddAsync(item);
+                await _context.SaveChangesAsync();
+                await CloneCode(item);
+                if (task.PIC.Count() > 0)
+                {
+                    listUsers.AddRange(await AddPIC(task, item));
+                }
+                if (task.Deputies.Count() > 0)
+                {
+                    listUsers.AddRange(await AddDeputy(task, item));
+
+                }
+                if (listUsers.Count > 0)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Join(",", listUsers.Distinct()), GetAlertDueDate());
+                    await _hubContext.Clients.All.SendAsync("ReceiveMessageForCurd", string.Join(",", listUsers.Distinct()));
+                }
+                await _context.SaveChangesAsync();
+                return Tuple.Create(true, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(false, "", new object());
+            }
+        }
+        private async Task<Tuple<bool, string, object>> EditTask(CreateTaskViewModel task)
+        {
+            try
+            {
+                // task.DueDate = task.DueDate;
+                var listUsers = new List<int>();
+                var edit = _context.Tasks.Find(task.ID);
+                var oldDueDateTime = edit.DueDateTime;
+                edit.Priority = task.Priority.ToUpper();
+                edit.JobName = task.JobName;
+                edit.Priority = task.Priority;
+                edit.DepartmentID = task.DepartmentID;
+                edit.FromWhoID = task.FromWhoID;
+
+                if (task.PIC.Count() >= 0)
+                {
+                    listUsers.AddRange(await EditPIC(task, edit));
+                }
+                if (task.Deputies.Count() >= 0)
+                {
+                    listUsers.AddRange(await EditDeputy(task, edit));
+                }
+                var pics = await _context.Tags.Where(x => x.TaskID.Equals(edit.ID)).Select(x => x.UserID).ToListAsync();
+                var duedatetime = task.DueDate.ToParseStringDateTime();
+                switch (task.periodType)
+                {
+                    case Data.Enum.PeriodType.Daily:
+                        edit.DueDateTime = duedatetime;
+                        break;
+                    case Data.Enum.PeriodType.Weekly:
+                        edit.DueDateTime = duedatetime;
+                        break;
+                    case Data.Enum.PeriodType.Monthly:
+                        edit.DueDateTime = duedatetime;
+
+                        break;
+                    case Data.Enum.PeriodType.SpecificDate:
+                        edit.DueDateTime = duedatetime;
+                        break;
+                    default:
+                        break;
+                }
+                await _context.SaveChangesAsync();
+
+                switch (task.periodType)
+                {
+                    case Data.Enum.PeriodType.Daily:
+                        if (!duedatetime.Equals(oldDueDateTime))
+                        {
+                            var daily = await AlertDeadlineChanging(Data.Enum.AlertDeadline.Daily, edit, edit.FromWhoID, pics);
+                            listUsers.AddRange(daily.Item1);
+                        }
+                        break;
+                    case Data.Enum.PeriodType.Weekly:
+                        if (!duedatetime.Equals(oldDueDateTime))
+                        {
+                            var weekly = await AlertDeadlineChanging(Data.Enum.AlertDeadline.Weekly, edit, edit.FromWhoID, pics);
+                            listUsers.AddRange(weekly.Item1);
+                        }
+                        break;
+                    case Data.Enum.PeriodType.Monthly:
+                        if (!duedatetime.Equals(oldDueDateTime))
+                        {
+                            var mon = await AlertDeadlineChanging(Data.Enum.AlertDeadline.Monthly, edit, edit.FromWhoID, pics);
+                            listUsers.AddRange(mon.Item1);
+                        }
+
+                        break;
+                    case Data.Enum.PeriodType.SpecificDate:
+                        if (!duedatetime.Equals(oldDueDateTime))
+                        {
+                            var due = await AlertDeadlineChanging(Data.Enum.AlertDeadline.Deadline, edit, edit.FromWhoID, pics);
+                            listUsers.AddRange(due.Item1);
+                        }
+                        break;
+                    default:
+                        break;
+                }
+
+                if (listUsers.Count > 0)
+                {
+                    await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Join(",", listUsers.Distinct()), GetAlertDueDate());
+                    await _hubContext.Clients.All.SendAsync("ReceiveMessageForCurd", string.Join(",", listUsers.Distinct()));
+                }
+                return Tuple.Create(true, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(false, "", new object());
+            }
+        }
+        public async Task<Tuple<Data.Models.Task, string, object>> CreateTask(CreateTaskViewModel task)
         {
             try
             {
@@ -936,7 +1063,7 @@ namespace Service.Implement
                     }
                     await _context.SaveChangesAsync();
 
-                    return Tuple.Create(true, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
+                    return Tuple.Create(item, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
 
                 }
                 else
@@ -1014,17 +1141,17 @@ namespace Service.Implement
                         default:
                             break;
                     }
+                    if (listUsers.Count > 0)
+                    {
+                        await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Join(",", listUsers.Distinct()), GetAlertDueDate());
+                        await _hubContext.Clients.All.SendAsync("ReceiveMessageForCurd", string.Join(",", listUsers.Distinct()));
+                    }
+                    return Tuple.Create(edit, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
                 }
-                if (listUsers.Count > 0)
-                {
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessage", string.Join(",", listUsers.Distinct()), GetAlertDueDate());
-                    await _hubContext.Clients.All.SendAsync("ReceiveMessageForCurd", string.Join(",", listUsers.Distinct()));
-                }
-                return Tuple.Create(true, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
             }
             catch (Exception ex)
             {
-                return Tuple.Create(false, "", new object());
+                return Tuple.Create(new Data.Models.Task(), "", new object());
             }
         }
         public async Task<object> Delete(int id, int userid)
@@ -1075,7 +1202,58 @@ namespace Service.Implement
                 };
             }
         }
-
+        public async Task<object> DeleteRoot(string jobName, int userid)
+        {
+            var item = await _context.Tasks.Where(x => x.JobName.Equals(jobName)).ToListAsync();
+            if (item.Count == 0)
+                return new
+                {
+                    status = -1,
+                    message = "Sorry! This task is not exists!"
+                };
+            // if (item.FirstOrDefault().CreatedBy != userid)
+            //     return new
+            //     {
+            //         status = -1,
+            //         message = "Sorry! Can not delete this task because you do not create this task!"
+            //     };
+            try
+            {
+                var arrTasks = item.Select(x => x.ID).ToList();
+                _context.Tags.RemoveRange(await _context.Tags.Where(x => arrTasks.Contains(x.TaskID)).ToListAsync());
+                _context.Deputies.RemoveRange(await _context.Deputies.Where(x => arrTasks.Contains(x.TaskID)).ToListAsync());
+                _context.Follows.RemoveRange(await _context.Follows.Where(x => arrTasks.Contains(x.TaskID)).ToListAsync());
+                var comments = await _context.Comments.Where(x => arrTasks.Contains(x.TaskID)).Include(x => x.CommentDetails).ToListAsync();
+                foreach (var comment in comments)
+                {
+                    _context.CommentDetails.RemoveRange(comment.CommentDetails);
+                }
+                _context.Comments.RemoveRange(comments);
+                var notifications = await _context.Notifications.Where(x => arrTasks.Contains(x.TaskID)).Include(x => x.NotificationDetails).ToListAsync();
+                foreach (var notification in notifications)
+                {
+                    _context.NotificationDetails.RemoveRange(notification.NotificationDetails);
+                }
+                _context.Notifications.RemoveRange(notifications);
+                _context.RemoveRange(item);
+                _context.Tutorials.RemoveRange(await _context.Tutorials.Where(x => arrTasks.Contains(x.TaskID ?? 0)).ToListAsync());
+                await _context.SaveChangesAsync();
+                return new
+                {
+                    status = 1,
+                    message = "The task has been deleted successfully!"
+                };
+            }
+            catch
+            {
+                return new
+                {
+                    status = 0,
+                    message = "Failed to delete!!!"
+                };
+            }
+            throw new NotImplementedException();
+        }
         #region Refactor Done Method
         private async Task<bool> PushTaskToHistory(History history)
         {
@@ -1537,7 +1715,7 @@ namespace Service.Implement
                 periodType = task.periodType,
                 CreatedBy = task.CreatedBy,
                 Level = task.Level,
-
+                GroupCode = task.Code
             };
             //Kiem tra cai task chuan bi clone nay da ton tai chua
             var check = await CheckExistTask(newTask);
@@ -1623,7 +1801,8 @@ namespace Service.Implement
                         periodType = item.periodType,
                         DueDateTime = MapDueDateTime(item),
                         JobTypeID = item.JobTypeID,
-                        CreatedDate = DateTime.Now
+                        CreatedDate = DateTime.Now,
+                        GroupCode = item.Code
                     };
                     var taskModel = await CreateTaskAsync(task);
                     temp.ID = taskModel.ID;
@@ -1988,11 +2167,11 @@ namespace Service.Implement
                                 .Include(x => x.Project).ThenInclude(x => x.TeamMembers)
                                 .Include(x => x.OC)
                                 .Include(x => x.Tutorial)
-                                .Where(x=> 
+                                .Where(x =>
                                 x.User.IsShow == true
-                                || x.Tags.Any(x=>x.User.IsShow)
-                                || x.Follows.Any(x=>x.User.IsShow)
-                                || x.Deputies.Any(x=>x.User.IsShow))
+                                || x.Tags.Any(x => x.User.IsShow)
+                                || x.Follows.Any(x => x.User.IsShow)
+                                || x.Deputies.Any(x => x.User.IsShow))
                                 .AsQueryable();
             return listTasks;
         }
@@ -2283,11 +2462,11 @@ namespace Service.Implement
                 var itemWithOutParent = all.Where(x => !flatten.Select(a => a.Entity.ID).Contains(x.ID)).Select(x => new HierarchyNode<TreeViewTask>
                 { Entity = x }).ToList();
                 tree = tree.Concat(itemWithOutParent).OrderByDescending(x => x.Entity.ID).ToList();
-                var model = tree.GroupBy(x => new { x.Entity.TaskCode, x.Entity.JobName, x.Entity.From }).Select(x => new RoutineViewModel
+                var model = tree.GroupBy(x => new { x.Entity.TaskCode}).Select(x => new RoutineViewModel
                 {
-                    JobName = x.Key.JobName,
-                    From = x.Key.From,
                     TaskCode = x.Key.TaskCode,
+                    JobName = x.OrderBy(x=>x.Entity.DueDate).FirstOrDefault().Entity.JobName,
+                    From = x.FirstOrDefault().Entity.From,
                     Tasks = x.ToList()
                 }).ToList();
                 return model;
@@ -2345,11 +2524,11 @@ namespace Service.Implement
             var listTasks = GetAllTasks()
                 .Where(x => x.JobTypeID.Equals(jobtype) && x.ProjectID == projectid && x.Status == false)
                 .Where(x =>
-                              (x.Tags.Select(x => x.UserID).Contains(userid)
-                               || x.Project.Managers.Select(x=>x.UserID).Contains(userid)
-                               || x.Project.TeamMembers.Select(x=>x.UserID).Contains(userid)
+                              x.Tags.Select(x => x.UserID).Contains(userid)
+                               || x.Project.Managers.Select(x => x.UserID).Contains(userid)
+                               || x.Project.TeamMembers.Select(x => x.UserID).Contains(userid)
                                || x.FromWhoID == userid
-                               || x.CreatedBy == userid)
+                               || x.CreatedBy == userid
                    )
                     .Where(x => !x.periodType.Equals(Data.Enum.PeriodType.Daily) || x.periodType.Equals(Data.Enum.PeriodType.Daily) && x.DueDateTime.Date.CompareTo(DateTime.Now.Date) != 1).Distinct();
 
@@ -2594,5 +2773,7 @@ namespace Service.Implement
             //}
             throw new NotImplementedException();
         }
+
+
     }
 }

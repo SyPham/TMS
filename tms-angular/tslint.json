@@ -87,5 +87,8 @@
   },
   "rulesDirectory": [
     "codelyzer"
-  ]
+  ],
+  "angularCompilerOptions": {
+    "enableIvy": false
+  }
 }

@@ -51,6 +51,9 @@ export class RoutineService {
       })
     );
   }
+  deleteRoot(jobName: string) {
+    return this.http.delete(`${this.baseUrl}Tasks/DeleteRoot/${jobName}`);
+  }
 
   getWho() {
     return this.http.get(`${this.baseUrl}Tasks/GetListUser/0`).pipe(

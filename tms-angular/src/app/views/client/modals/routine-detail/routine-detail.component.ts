@@ -14,6 +14,7 @@ import { TutorialModalComponent } from '../../routine/tutorial-modal/tutorial-mo
 import { AddTaskModalComponent } from '../../routine/add-task-modal/add-task-modal.component';
 import { ProjectDetailService } from 'src/app/_core/_service/projectDetail.service';
 import { Task } from 'src/app/_core/_model/Task';
+import { AddTask } from 'src/app/_core/_model/add.task';
 
 @Component({
   selector: 'app-routine-detail',
@@ -23,6 +24,7 @@ import { Task } from 'src/app/_core/_model/Task';
 export class RoutineDetailComponent implements OnInit {
   @Input() title: string;
   @Input() tasks: any;
+  @Input() ocId: number;
   public data: any;
   @ViewChild('treegridTasks')
   public treeGridObj: TreeGridComponent;
@@ -38,11 +40,11 @@ export class RoutineDetailComponent implements OnInit {
   public ocLevel = JSON.parse(localStorage.getItem('user')).User.OCLevel;
   public isLeader = JSON.parse(localStorage.getItem('user')).User.IsLeader;
   public currentUser = JSON.parse(localStorage.getItem('user')).User.ID;
-  public contextMenuItems: object;
+  public contextMenuItems: object[];
   public filterSettings: FilterSettingsModel;
   private tutorialName: string;
   searchSettings: object;
-  ocId: any;
+  ocID: any;
   constructor(
     private modalService: NgbModal,
     private spinner: NgxSpinnerService,
@@ -56,8 +58,11 @@ export class RoutineDetailComponent implements OnInit {
 
   ngOnInit(): void {
     this.data = this.tasks.Tasks;
+    this.ocID = this.ocID;
     this.optionGridTree();
-    console.log(this.tasks.Tasks)
+    this.checkRole();
+    console.log('ngOnInit routine-detail', this.data);
+    console.log('ngOnInit routine-detail', this.tasks.Tasks);
   }
   optionGridTree() {
     this.filterSettings = { type: 'CheckBox' };
@@ -75,12 +80,112 @@ export class RoutineDetailComponent implements OnInit {
       ignoreCase: true
     };
   }
+  checkRole() {
+    if (this.ocLevel >= 3 && !this.isLeader) {
+      this.toolbarOptionsTasks = [
+        'Search',
+        'ExpandAll',
+        'CollapseAll',
+        'ExcelExport',
+        'Print',
+        { text: 'All columns', tooltipText: 'Show all columns', prefixIcon: 'e-add', id: 'AllColumns' },
+        { text: 'Default columns', tooltipText: 'Show default columns', prefixIcon: 'e-add', id: 'DefaultColumns' },
+      ];
+      this.contextMenuItems = [
+        {
+          text: 'Add Tutorial Video',
+          iconCss: 'fa fa-plus-square',
+          target: '.e-content',
+          id: 'Tutorial'
+        },
+        {
+          text: 'Edit Tutorial',
+          iconCss: 'fa fa-wrench',
+          target: '.e-content',
+          id: 'EditTutorial'
+        },
+        {
+          text: 'Watch Video',
+          iconCss: 'fa fa-play',
+          target: '.e-content',
+          id: 'WatchVideo'
+        },
+        {
+          text: 'Follow',
+          iconCss: ' fa fa-bell',
+          target: '.e-content',
+          id: 'Follow'
+        },
+      ];
+    } else {
+      this.toolbarOptionsTasks = [
+        // { text: 'Add New', tooltipText: 'Add New', prefixIcon: 'e-add', id: 'CreateNew' },
+        'Search',
+        'ExpandAll',
+        'CollapseAll',
+        'ExcelExport',
+        'Print',
+        // { text: 'All columns', tooltipText: 'Show all columns', prefixIcon: 'e-add', id: 'AllColumns' },
+        // { text: 'Default columns', tooltipText: 'Show default columns', prefixIcon: 'e-add', id: 'DefaultColumns' },
+      ];
+      this.contextMenuItems = [
+        {
+          text: 'Add Sub-Task',
+          iconCss: ' e-icons e-add',
+          target: '.e-content',
+          id: 'Add-Sub-Task'
+        },
+        {
+          text: 'Edit',
+          iconCss: ' e-icons e-edit',
+          target: '.e-content',
+          id: 'EditTask'
+        },
+        {
+          text: 'Delete',
+          iconCss: ' e-icons e-delete',
+          target: '.e-content',
+          id: 'DeleteTask'
+        },
+        {
+          text: 'Add Tutorial Video',
+          iconCss: 'fa fa-plus-square',
+          target: '.e-content',
+          id: 'Tutorial'
+        },
+        {
+          text: 'Edit Tutorial',
+          iconCss: 'fa fa-wrench',
+          target: '.e-content',
+          id: 'EditTutorial'
+        },
+        {
+          text: 'Watch Video',
+          iconCss: 'fa fa-play',
+          target: '.e-content',
+          id: 'WatchVideo'
+        },
+        {
+          text: 'Follow',
+          iconCss: ' fa fa-bell',
+          target: '.e-content',
+          id: 'Follow'
+        },
+        {
+          text: 'Unfollow',
+          iconCss: ' fa fa-bell-slash',
+          target: '.e-content',
+          id: 'Unfollow'
+        }
+      ];
+    }
+  }
   recordDoubleClick(agrs?: any) {
     this.openCommentModal(agrs);
   }
 
   contextMenuClick(args) {
-    // console.log('contextMenuClick', args);
+    console.log('contextMenuClick', args);
     const data = args.rowInfo.rowData.Entity;
     // console.log('contextMenuClickdata', data);
 
@@ -109,17 +214,61 @@ export class RoutineDetailComponent implements OnInit {
         break;
     }
   }
-  toolbarClick(args) { }
+  toolbarClick(args) {
+    switch (args.item.text) {
+      case 'PDF Export':
+        this.treeGridObj.pdfExport({ hierarchyExportMode: 'All' });
+        break;
+      case 'Excel Export':
+        this.treeGridObj.excelExport({ hierarchyExportMode: 'All' });
+        break;
+      case 'Add New':
+        this.openAddMainTaskModal();
+        break;
+      case 'All columns':
+        this.showAllColumnsTreegrid();
+        break;
+      case 'Default columns':
+        this.defaultColumnsTreegrid();
+        break;
+    }
+   }
+  defaultColumnsTreegrid() {
+    const show = ['Follow', 'Priority', 'From', 'Task Name',
+      'Created Date', 'Finished DateTime',
+      'PIC', 'Status', 'Deputy', 'Watch Video', 'Period Type'];
+    for (const item of show) {
+      this.treeGridObj.showColumns([item, 'Ship Name']);
+    }
+  }
+  showAllColumnsTreegrid() {
+    const hide = ['Follow', 'Priority', 'From', 'Status', 'Watch Video', 'Deputy', 'Period Type'];
+    for (const item of hide) {
+      this.treeGridObj.hideColumns([item, 'Ship Name']);
+    }
+  }
+  openAddMainTaskModal() {
+    const modalRef = this.modalService.open(AddTaskModalComponent, { size: 'xl' });
+    modalRef.componentInstance.title = 'Add Routine Main Task';
+    modalRef.componentInstance.ocid = this.ocId;
+    modalRef.componentInstance.jobType = JobType.Routine;
+    modalRef.result.then((result) => {
+      // console.log('openAddMainTaskModal', result)
+    }, (reason) => {
+    });
+    this.jobtypeService.changeMessage(JobType.Routine);
+  }
   dataBound(args) { }
   periodText(enumVal) {
     return this.getEnumKeyByEnumValue(PeriodType, Number(enumVal));
   }
   getEnumKeyByEnumValue(myEnum, enumValue) {
-    let keys = Object.keys(myEnum).filter(x => myEnum[x] === enumValue);
+    const keys = Object.keys(myEnum).filter(x => myEnum[x] === enumValue);
     return keys.length > 0 ? keys[0] : null;
   }
 
-  contextMenuOpen(args) { }
+  contextMenuOpen(args) {
+   }
   delete() {
     if (this.taskId > 0) {
       this.alertify.confirm(
@@ -151,6 +300,7 @@ export class RoutineDetailComponent implements OnInit {
     this.routineService.follow(id).subscribe(res => {
       this.alertify.success('You have already followd this one!');
       // this.getTasks();
+      this.addTaskService.changeMessage(new AddTask(JobType.Routine, this.ocId));
     });
   }
   private editTask(args?): Task {

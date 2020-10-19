@@ -20,7 +20,7 @@ import { Subscription } from 'rxjs';
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.css']
 })
-export class HeaderComponent implements OnInit {
+export class HeaderComponent implements OnInit, OnDestroy {
   public data: any;
   private intervalID: any;
   private intervalSignalr: any;
@@ -183,7 +183,7 @@ export class HeaderComponent implements OnInit {
   }
 
   pushToMainPage() {
-    let role = JSON.parse(localStorage.getItem('user')).User.Role;
+    const role = JSON.parse(localStorage.getItem('user')).User.Role;
     if (role === 1) {
       this.router.navigate(['/admin/dash']);
     } else if (role === 2) {
@@ -191,7 +191,7 @@ export class HeaderComponent implements OnInit {
     }
   }
   checkServer() {
-    let user = JSON.parse(localStorage.getItem('user')).User.Username;
+    const user = JSON.parse(localStorage.getItem('user')).User.Username;
     this.intervalSignalr = setInterval(() => {
       if (signalr.CONNECTION_HUB.state) {
         // console.log(user + ' yeu cau server check alert');
@@ -205,8 +205,8 @@ export class HeaderComponent implements OnInit {
   }
   checkAlert() {
     if (signalr.CONNECTION_HUB.state === 'Connected') {
-      let user = JSON.parse(localStorage.getItem('user')).User.Username;
-      let userId = JSON.parse(localStorage.getItem('user')).User.ID;
+      const user = JSON.parse(localStorage.getItem('user')).User.Username;
+      const userId = JSON.parse(localStorage.getItem('user')).User.ID;
       signalr.CONNECTION_HUB
         .invoke('CheckAlert', userId.toString())
         .catch((err) => {
@@ -227,7 +227,7 @@ getNotifications() {
 }
 
 getAvatar() {
-  let img = localStorage.getItem('avatar');
+  const img = localStorage.getItem('avatar');
   if (img === 'null') {
     this.avatar = this.defaultImage();
   } else {
@@ -258,7 +258,7 @@ seen(item) {
     this.data = [];
     this.getNotifications();
   });
-  let obj: IHeader = {
+  const obj: IHeader = {
     router: item.URL,
     message: item.URL,
   };

@@ -143,6 +143,13 @@ namespace WorkManagement.Controllers
             var userID = JWTExtensions.GetDecodeTokenByProperty(token, "nameid").ToInt();
             return Ok(await _taskService.Delete(id, userID));
         }
+        [HttpDelete("{jobName}")]
+        public async Task<IActionResult> DeleteRoot(string jobName)
+        {
+            string token = Request.Headers["Authorization"];
+            var userID = JWTExtensions.GetDecodeTokenByProperty(token, "nameid").ToInt();
+            return Ok(await _taskService.DeleteRoot(jobName, userID));
+        }
         [HttpGet("{id}")]
         public async Task<IActionResult> Done(int id)
         {

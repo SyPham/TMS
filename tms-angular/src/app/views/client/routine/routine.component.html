@@ -33,7 +33,9 @@
           [toolbar]='toolbarOptionsTasks' allowPaging='true' [allowExcelExport]='true' [allowPdfExport]='true'
           gridLines='Both' [allowResizing]='true' showColumnMenu='true' allowSorting='true' allowFiltering='true'
           (toolbarClick)='toolbarClick($event)' 
-          [searchSettings]='searchSettings' 
+          [searchSettings]='searchSettings'
+          (dataBound)='dataBound()'
+          (rowSelected)='rowSelectedTask($event)'
           (contextMenuClick)="contextMenuClick($event)"  
           (recordDoubleClick)="recordDoubleClick($event)"
           (contextMenuOpen)='contextMenuOpen($event)'>

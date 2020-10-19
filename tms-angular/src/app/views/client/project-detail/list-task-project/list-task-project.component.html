@@ -83,7 +83,7 @@
             style="padding:4px;color:white">{{data.Entity.state}}</span>
         </ng-template>
       </e-column>
-      <e-column field="Entity.DueDate" type='date' format='dd MMM, yyyy hh:mm:ss a' clipMode='EllipsisWithTooltip' headerText="Due Date Time" width="200" textAlign="Center">
+      <e-column field="Entity.DueDate" type='date' format='yyyy/MM/dd hh:mm' clipMode='EllipsisWithTooltip' headerText="Due Date Time" width="200" textAlign="Center">
       </e-column>
       <e-column field="Entity.periodType" headerText="Period Type" width="200" textAlign="Center">
         <ng-template #template let-data>
@@ -91,7 +91,7 @@
         </ng-template>
       </e-column>
       <!-- <e-column field="Entity.ModifyDateTime" headerText="Finished DateTime" width="200" textAlign="Center"></e-column> -->
-      <e-column field="Entity.CreatedDate"type='date' format='d MMM, yyyy hh:mm:ss a' headerText="Created Date Time" width="200" textAlign="Center"></e-column>
+      <e-column field="Entity.CreatedDate"type='date' format='yyyy/MM/dd hh:mm' headerText="Created Date Time" width="200" textAlign="Center"></e-column>
         </e-columns>
     </ejs-treegrid>
 </div>

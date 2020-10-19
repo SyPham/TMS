@@ -400,7 +400,7 @@ export class AddTaskModalComponent implements OnInit {
     this.duedatequarterly = '';
     this.duedateyearly = '';
     this.duedatedaily = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 7, 0);
-    this.deadline =new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 7, 0);
+    this.deadline = new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 7, 0);
     this.priority = 'M';
     this.pic = 0;
     this.jobtypeService.currentMessage.subscribe(res => {

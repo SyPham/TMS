@@ -16,10 +16,11 @@ namespace Service.Interface
         /// </summary>
         /// <returns></returns>
         Task<Tuple<List<int>,List<int>>> TaskListLate();
-        Task<Tuple<bool, string, object>> CreateTask(CreateTaskViewModel task);
+        Task<Tuple<Data.Models.Task, string, object>> CreateTask(CreateTaskViewModel task);
         Task<object> CreateSubTask(CreateTaskViewModel task);
         Task<object> UpdateTask(UpdateTaskViewModel task);
         Task<object> Delete(int id, int userid);
+        Task<object> DeleteRoot(string jobName, int userid);
         Task<Tuple<bool, bool, string>> Done(int id, int userid);
         Task<object> From(int userid);
         Task<List<ProjectViewModel>> GetListProject();

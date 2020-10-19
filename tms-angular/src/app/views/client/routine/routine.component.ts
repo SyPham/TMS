@@ -39,6 +39,8 @@ export class RoutineComponent implements OnInit, OnDestroy {
   public taskId: number;
   public showTasks: boolean;
   public parentId: number;
+  public rowSelectedTaskIndex = 0;
+  public showDetailModal = false;
   public toolbarOptions: any[];
   public toolbarOptionsTasks: any[];
   public tasks: object;
@@ -52,6 +54,8 @@ export class RoutineComponent implements OnInit, OnDestroy {
   private tutorialName: string;
   searchSettings: object;
   ocId = 0;
+  jobName: string;
+  itemDetailModal: any;
   constructor(
     config: NgbModalConfig,
     private modalService: NgbModal,
@@ -86,6 +90,17 @@ export class RoutineComponent implements OnInit, OnDestroy {
       key: '',
       ignoreCase: true
     };
+  }
+  dataBound() {
+    this.treeGridObj.selectRows([this.rowSelectedTaskIndex]);
+    if (this.showDetailModal) {
+      const item = this.treeGridObj.getSelectedRecords()[0];
+      this.itemDetailModal = item;
+      console.log('data bound', this.itemDetailModal);
+      this.modalService.dismissAll();
+      this.openRoutineDetailModal(this.itemDetailModal);
+    }
+
   }
   resolver() {
     // $('#overlay').fadeIn();
@@ -154,6 +169,33 @@ export class RoutineComponent implements OnInit, OnDestroy {
       );
     }
   }
+  deleteRoot() {
+    if (this.jobName) {
+      this.alertify.confirm(
+        'Delete Routine Root Task',
+        'Are you sure you want to delete this Job Name "' + this.jobName + '" ?',
+        () => {
+          this.routineService.deleteRoot(this.jobName).subscribe(
+            (res: any) => {
+              if (res.status === -1) {
+                this.alertify.warning(res.message, true);
+              }
+              if (res.status === 1) {
+                this.alertify.success(res.message);
+                this.getTasks();
+              }
+              if (res.status === 0) {
+                this.alertify.warning(res.message, true);
+              }
+            },
+            error => {
+              this.alertify.error('Failed to delete the Job Name');
+            }
+          );
+        }
+      );
+    }
+  }
   follow(id) {
     this.routineService.follow(id).subscribe(res => {
       this.alertify.success('You have already followd this one!');
@@ -172,30 +214,30 @@ export class RoutineComponent implements OnInit, OnDestroy {
         { text: 'Default columns', tooltipText: 'Show default columns', prefixIcon: 'e-add', id: 'DefaultColumns' },
       ];
       this.contextMenuItems = [
-        {
-          text: 'Add Tutorial Video',
-          iconCss: 'fa fa-plus-square',
-          target: '.e-content',
-          id: 'Tutorial'
-        },
-        {
-          text: 'Edit Tutorial',
-          iconCss: 'fa fa-wrench',
-          target: '.e-content',
-          id: 'EditTutorial'
-        },
-        {
-          text: 'Watch Video',
-          iconCss: 'fa fa-play',
-          target: '.e-content',
-          id: 'WatchVideo'
-        },
-        {
-          text: 'Follow',
-          iconCss: ' fa fa-bell',
-          target: '.e-content',
-          id: 'Follow'
-        },
+        // {
+        //   text: 'Add Tutorial Video',
+        //   iconCss: 'fa fa-plus-square',
+        //   target: '.e-content',
+        //   id: 'Tutorial'
+        // },
+        // {
+        //   text: 'Edit Tutorial',
+        //   iconCss: 'fa fa-wrench',
+        //   target: '.e-content',
+        //   id: 'EditTutorial'
+        // },
+        // {
+        //   text: 'Watch Video',
+        //   iconCss: 'fa fa-play',
+        //   target: '.e-content',
+        //   id: 'WatchVideo'
+        // },
+        // {
+        //   text: 'Follow',
+        //   iconCss: ' fa fa-bell',
+        //   target: '.e-content',
+        //   id: 'Follow'
+        // },
       ];
     } else {
       this.toolbarOptionsTasks = [
@@ -209,59 +251,59 @@ export class RoutineComponent implements OnInit, OnDestroy {
         // { text: 'Default columns', tooltipText: 'Show default columns', prefixIcon: 'e-add', id: 'DefaultColumns' },
       ];
       this.contextMenuItems = [
-        {
-          text: 'Add Sub-Task',
-          iconCss: ' e-icons e-add',
-          target: '.e-content',
-          id: 'Add-Sub-Task'
-        },
-        {
-          text: 'Edit',
-          iconCss: ' e-icons e-edit',
-          target: '.e-content',
-          id: 'EditTask'
-        },
+        // {
+        //   text: 'Add Sub-Task',
+        //   iconCss: ' e-icons e-add',
+        //   target: '.e-content',
+        //   id: 'Add-Sub-Task'
+        // },
+        // {
+        //   text: 'Edit',
+        //   iconCss: ' e-icons e-edit',
+        //   target: '.e-content',
+        //   id: 'EditTask'
+        // },
         {
           text: 'Delete',
           iconCss: ' e-icons e-delete',
           target: '.e-content',
           id: 'DeleteTask'
         },
-        {
-          text: 'Add Tutorial Video',
-          iconCss: 'fa fa-plus-square',
-          target: '.e-content',
-          id: 'Tutorial'
-        },
-        {
-          text: 'Edit Tutorial',
-          iconCss: 'fa fa-wrench',
-          target: '.e-content',
-          id: 'EditTutorial'
-        },
-        {
-          text: 'Watch Video',
-          iconCss: 'fa fa-play',
-          target: '.e-content',
-          id: 'WatchVideo'
-        },
-        {
-          text: 'Follow',
-          iconCss: ' fa fa-bell',
-          target: '.e-content',
-          id: 'Follow'
-        },
-        {
-          text: 'Unfollow',
-          iconCss: ' fa fa-bell-slash',
-          target: '.e-content',
-          id: 'Unfollow'
-        }
+        // {
+        //   text: 'Add Tutorial Video',
+        //   iconCss: 'fa fa-plus-square',
+        //   target: '.e-content',
+        //   id: 'Tutorial'
+        // },
+        // {
+        //   text: 'Edit Tutorial',
+        //   iconCss: 'fa fa-wrench',
+        //   target: '.e-content',
+        //   id: 'EditTutorial'
+        // },
+        // {
+        //   text: 'Watch Video',
+        //   iconCss: 'fa fa-play',
+        //   target: '.e-content',
+        //   id: 'WatchVideo'
+        // },
+        // {
+        //   text: 'Follow',
+        //   iconCss: ' fa fa-bell',
+        //   target: '.e-content',
+        //   id: 'Follow'
+        // },
+        // {
+        //   text: 'Unfollow',
+        //   iconCss: ' fa fa-bell-slash',
+        //   target: '.e-content',
+        //   id: 'Unfollow'
+        // }
       ];
     }
   }
   getEnumKeyByEnumValue(myEnum, enumValue) {
-    let keys = Object.keys(myEnum).filter(x => myEnum[x] === enumValue);
+    const keys = Object.keys(myEnum).filter(x => myEnum[x] === enumValue);
     return keys.length > 0 ? keys[0] : null;
   }
   periodText(enumVal) {
@@ -354,11 +396,12 @@ export class RoutineComponent implements OnInit, OnDestroy {
     // }
   }
   contextMenuClick(args?: any): void {
-    // console.log('contextMenuClick', args);
-    const data = args.rowInfo.rowData.Entity;
+    console.log('contextMenuClick', args);
+    const data = args.rowInfo.rowData;
     // console.log('contextMenuClickdata', data);
 
-    this.taskId = data.ID;
+    // this.taskId = data.ID;
+    this.jobName = data.JobName;
     this.tutorialName = data.JobName;
     this.srcTutorial = data.VideoLink;
     switch (args.item.id) {
@@ -379,9 +422,16 @@ export class RoutineComponent implements OnInit, OnDestroy {
         this.openEditTaskModal(args);
         break;
       case 'DeleteTask':
-        this.delete();
+        this.deleteRoot();
         break;
     }
+  }
+  rowSelectedTask(args) {
+    if (args.isInteracted) {
+      this.rowSelectedTaskIndex = args.rowIndex;
+      this.itemDetailModal = args.data;
+    }
+    console.log('rowSelectedTask', args);
   }
   rowSelected(args?) {
     this.ocId = args.data.key;
@@ -398,9 +448,14 @@ export class RoutineComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.open(RoutineDetailComponent, { size: 'xl' });
     modalRef.componentInstance.title = 'Routine Detail';
     modalRef.componentInstance.tasks = arg;
+    modalRef.componentInstance.ocId = this.ocId;
+    this.itemDetailModal = arg;
+    this.showDetailModal = true;
     modalRef.result.then((result) => {
-      // console.log('openRoutineDetailModal', result);
+      console.log('openRoutineDetailModal', result);
     }, (reason) => {
+        console.log('Close RoutineDetailModal');
+        this.showDetailModal = false;
     });
     this.jobtypeService.changeMessage(JobType.Routine);
   }
