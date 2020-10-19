@@ -3,6 +3,7 @@ using Data;
 using Data.Models;
 using Data.ViewModel.User;
 using Microsoft.EntityFrameworkCore;
+using Service.Dto;
 using Service.Helpers;
 using Service.Interface;
 using System;
@@ -33,10 +34,19 @@ namespace Service.Implement
 
             user.PasswordHash = passwordHash;
             user.PasswordSalt = passwordSalt;
+            user.ModifyTime = DateTime.Now;
+            user.IsShow = true;
             await _context.Users.AddAsync(user);
-
             try
             {
+                await _context.SaveChangesAsync();
+                _context.UserSystems.Add(new UserSystem
+                {
+                    UserID = user.ID,
+                    SystemID = entity.SystemCode,
+                    Status = true,
+                    DateTime = DateTime.UtcNow
+                });
                 await _context.SaveChangesAsync();
                 return user.ID;
             }
@@ -70,15 +80,6 @@ namespace Service.Implement
         public async Task<bool> Delete(int id)
         {
             var entity = await _context.Users.FindAsync(id);
-            var tags = await _context.Tags.Where(x=>x.UserID.Equals(id)).ToListAsync();
-            var tasks = await _context.Tasks.Where(x=>x.CreatedBy.Equals(id)).ToListAsync();
-            var managers = await _context.Managers.Where(x => x.UserID.Equals(id)).ToListAsync();
-            var members = await _context.TeamMembers.Where(x => x.UserID.Equals(id)).ToListAsync();
-            var notifications = await _context.Notifications.Where(x => x.UserID.Equals(id)).ToListAsync();
-            var notificationDetails = await _context.NotificationDetails.Where(x => x.UserID.Equals(id)).ToListAsync();
-            var ocUsers = await _context.OCUsers.Where(x => x.UserID.Equals(id)).ToListAsync();
-            var deputies = await _context.Deputies.Where(x => x.UserID.Equals(id)).ToListAsync();
-
 
             if (entity == null)
             {
@@ -87,15 +88,8 @@ namespace Service.Implement
 
             try
             {
-                _context.Tags.RemoveRange(tags);
-                _context.Tasks.RemoveRange(tasks);
-                _context.Managers.RemoveRange(managers);
-                _context.TeamMembers.RemoveRange(members);
-                _context.Notifications.RemoveRange(notifications);
-                _context.NotificationDetails.RemoveRange(notificationDetails);
-                _context.OCUsers.RemoveRange(ocUsers);
-                _context.Deputies.RemoveRange(deputies);
-                _context.Users.Remove(entity);
+                entity.IsShow = false;
+                _context.Users.Update(entity); 
                 await _context.SaveChangesAsync();
                 return true;
             }
@@ -128,12 +122,12 @@ namespace Service.Implement
 
         public async Task<List<User>> GetAll()
         {
-            return await _context.Users.Where(x => x.Username != "admin").ToListAsync();
+            return await _context.Users.Where(x => x.IsShow == true && x.Username != "admin").ToListAsync();
         }
 
         public async Task<PagedList<ListViewModel>> GetAllPaging(int page, int pageSize, string keyword)
         {
-            var source = _context.Users.Where(x => x.Username != "admin").OrderByDescending(x=>x.ID).Select(x => new ListViewModel { isLeader = x.isLeader, ID = x.ID, Username = x.Username, Email = x.Email, RoleName = x.Role.Name, RoleID = x.RoleID, EmployeeID = x.EmployeeID }).AsQueryable();
+            var source = _context.Users.Include(x=>x.UserSystems).Where(x =>x.IsShow == true && x.Username != "admin").OrderByDescending(x=>x.ID).Select(x => new ListViewModel { isLeader = x.isLeader, ID = x.ID, Username = x.Username, Email = x.Email, RoleName = x.Role.Name, RoleID = x.RoleID, EmployeeID = x.EmployeeID }).AsQueryable();
             if (!keyword.IsNullOrEmpty())
             {
                 source = source.Where(x => x.Username.Contains(keyword) || x.Email.Contains(keyword));
@@ -143,12 +137,12 @@ namespace Service.Implement
 
         public async Task<User> GetByID(int id)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users.Include(x=>x.UserSystems).FirstOrDefaultAsync(x=> x.ID == id);
         }
 
         public async Task<object> GetListUser()
         {
-            return await _context.Users.Where(x => x.Username != "admin").Select(x => new { x.ID, x.Username, x.Email, RoleName = x.Role.Name, x.RoleID }).ToListAsync();
+            return await _context.Users.Where(x =>x.IsShow == true && x.Username != "admin").Select(x => new { x.ID, x.Username, x.Email, RoleName = x.Role.Name, x.RoleID }).ToListAsync();
 
         }
 
@@ -157,6 +151,8 @@ namespace Service.Implement
             var item = await _context.Users.FindAsync(entity.ID);
             item.Username = entity.Username;
             item.Email = entity.Email;
+            item.ModifyTime = DateTime.Now;
+
             item.RoleID = entity.RoleID;
             item.isLeader = entity.isLeader;
             if (item.PasswordHash.IsNullOrEmpty() && item.PasswordSalt.IsNullOrEmpty())
@@ -167,6 +163,27 @@ namespace Service.Implement
                 item.PasswordHash = passwordHash;
                 item.PasswordSalt = passwordSalt;
             }
+            
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+
+            }
+        }
+        public async Task<bool> Update(UpdateUserDto entity)
+        {
+            var item = await _context.Users.FindAsync(entity.ID);
+                byte[] passwordHash, passwordSalt;
+                CreatePasswordHash(entity.Password, out passwordHash, out passwordSalt);
+                item.PasswordHash = passwordHash;
+                item.PasswordSalt = passwordSalt;
+                item.ModifyTime = DateTime.Now;
+
             try
             {
                 await _context.SaveChangesAsync();
@@ -193,31 +210,58 @@ namespace Service.Implement
 
         public async Task<List<string>> GetUsernames()
         {
-            return await _context.Users.Where(x => x.Username != "admin").Select(x => x.Username).ToListAsync();
+            return await _context.Users.Where(x =>x.IsShow == true && x.Username != "admin").Select(x => x.Username).ToListAsync();
 
         }
 
-        public async Task<bool> ResetPassword(int id)
+        public async Task<UserResetPasswordVM> ResetPassword(int id)
         {
             byte[] passwordHash, passwordSalt;
             var item = await _context.Users.FindAsync(id);
             string pass = "1";
+            item.ModifyTime = DateTime.Now;
             CreatePasswordHash("1", out passwordHash, out passwordSalt);
             try
             {
                 item.PasswordHash = passwordHash;
                 item.PasswordSalt = passwordSalt;
                 await _context.SaveChangesAsync();
-                return true;
+               var user = new UserViewModel();
+                user.Email = item.Email;
+                    user.Username = item.Username;
+                    user.Username = item.Username;
+                return new UserResetPasswordVM { Status = true };
             }
             catch (Exception)
             {
-                return false;
+                return new UserResetPasswordVM();
                 throw;
             }
-            throw new NotImplementedException();
         }
+        public async Task<UserResetPasswordVM> ResetPassword(UserResetPasswordVM user)
+        {
+            byte[] passwordHash, passwordSalt;
+            var item = await _context.Users.FirstOrDefaultAsync(x=> x.Username.Equals(user.UsernameOrEmail) || x.Email.Equals(user.UsernameOrEmail));
+            string pass = "1";
+            item.ModifyTime = DateTime.Now;
 
+
+            CreatePasswordHash("1", out passwordHash, out passwordSalt);
+            try
+            {
+                item.PasswordHash = passwordHash;
+                item.PasswordSalt = passwordSalt;
+                await _context.SaveChangesAsync();
+                user.Status = true;
+                return user;
+            }
+            catch (Exception)
+            {
+                user.Status = false;
+                return user;
+                throw;
+            }
+        }
         public async Task<bool> UpdateTokenLineForUser(string token, int userID)
         {
             var item = await _context.Users.FindAsync(userID);
@@ -238,6 +282,37 @@ namespace Service.Implement
             item.AccessTokenLineNotify = null;
             try
             {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch (Exception)
+            {
+                return false;
+            }
+        }
+
+        public async Task<PagedList<ListViewModel>> GetAllPaging(int systemCode, int page, int pageSize, string keyword)
+        {
+            var source = _context.Users.Include(x=>x.UserSystems).Where(x =>x.IsShow == true && x.Username != "admin" && x.UserSystems.Where(x=>x.Status == true).Select(x=>x.SystemID).Contains(systemCode)).OrderByDescending(x => x.ID).Select(x => new ListViewModel { isLeader = x.isLeader, ID = x.ID, Username = x.Username, Email = x.Email, RoleName = x.Role.Name, RoleID = x.RoleID, EmployeeID = x.EmployeeID }).AsQueryable();
+            if (!keyword.IsNullOrEmpty())
+            {
+                source = source.Where(x => x.Username.Contains(keyword) || x.Email.Contains(keyword));
+            }
+            return await PagedList<ListViewModel>.CreateAsync(source, page, pageSize);
+        }
+
+        public async Task<bool> ChangePassword(int userId, string password)
+        {
+             byte[] passwordHash, passwordSalt;
+            var item = await _context.Users.FindAsync(userId);
+            string pass = password;
+            item.ModifyTime = DateTime.Now;
+
+            CreatePasswordHash(pass, out passwordHash, out passwordSalt);
+            try
+            {
+                item.PasswordHash = passwordHash;
+                item.PasswordSalt = passwordSalt;
                 await _context.SaveChangesAsync();
                 return true;
             }

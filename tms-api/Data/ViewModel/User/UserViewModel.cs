@@ -16,6 +16,7 @@ namespace Data.ViewModel.User
         public string Email { get; set; }
         public string ImageUrl { get; set; }
         public int RoleID { get; set; }
+        public int SystemCode { get; set; }
         public bool isLeader { get; set; }
         public IFormFile Photo { get; set; }
 

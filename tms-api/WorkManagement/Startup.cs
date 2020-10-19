@@ -136,6 +136,10 @@ namespace WorkManagement
             services.AddScoped<ITutorialService, TutorialService>();
             services.AddScoped<INotificationDetailService, NotificationDetailService>();
             services.AddScoped<ILineService, LineService>();
+            services.AddScoped<IUserSystemService, UserSystemService>();
+            //extension
+            services.AddScoped<IMailExtension, MailExtension>();
+
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -24,6 +24,7 @@ namespace Data.Models
         public int Level { get; set; }
         public DateTime CreatedTime { get; set; }
         public virtual ICollection<CommentDetail> CommentDetails { get; set; }
+        public virtual Data.Models.Task Task { get; set; }
 
     }
 }

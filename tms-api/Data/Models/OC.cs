@@ -17,6 +17,7 @@ namespace Data.Models
         public int Level { get; set; }
         public int ParentID { get; set; }
         public virtual ICollection<Task> Tasks { get; set; }
+        public virtual ICollection<OCUser> OCUsers { get; set; }
 
     }
 }

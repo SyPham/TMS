@@ -1,10 +1,12 @@
 ﻿using Data;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using Service.Helpers;
 using Service.Interface;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Text;
@@ -48,7 +50,7 @@ namespace Service.Implement
         }
         public async Task<User> FindByNameAsync(string username)
         {
-            var item = await _context.Users.FirstOrDefaultAsync(x => x.Username.ToLower().Equals(username) || x.EmployeeID.ToLower().Equals(username));
+            var item = await _context.Users.Include(x=>x.UserSystems).FirstOrDefaultAsync(x => x.IsShow && x.Username.ToLower().Equals(username) || x.EmployeeID.ToLower().Equals(username));
             if (item != null)
                 return item;
 
@@ -101,6 +103,41 @@ namespace Service.Implement
                 }
             }
             this.disposed = true;
+        }
+
+        public async Task<bool> SignInHistory(SignInHistory signInHistory)
+        {
+            var item = await _context.SignInHistories.FirstOrDefaultAsync(x => x.Token.Equals(signInHistory.Token));
+            if (item == null)
+            {
+                _context.SignInHistories.Add(signInHistory);
+            } else
+            {
+                item.LastRequestEndTime = DateTime.Now;
+                _context.SignInHistories.Update(item);
+            }
+            try
+            {
+                await _context.SaveChangesAsync();
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public async Task<object> GetSignInHistory()
+        {
+            var model = await _context.SignInHistories.Include(x=>x.SystemCodeTbl).Select(x => new
+            {
+                x.Username,
+                x.Host,
+                x.LoginTime,
+                x.LastRequestEndTime,
+                System = x.SystemCodeTbl.Name
+            }).ToListAsync();
+            return model;
         }
     }
 }

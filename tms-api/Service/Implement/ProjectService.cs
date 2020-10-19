@@ -232,6 +232,7 @@ namespace Service.Implement
                 {
                     return false;
                 }
+                _context.Tutorials.RemoveRange(await _context.Tutorials.Where(_ => _.ProjectID == id).ToListAsync());
                 _context.Rooms.Remove(await _context.Rooms.FirstOrDefaultAsync(_ => _.ProjectID == id));
                 _context.Managers.RemoveRange(await _context.Managers.Where(_ => _.ProjectID == id).ToListAsync());
                 _context.TeamMembers.RemoveRange(await _context.TeamMembers.Where(_ => _.ProjectID == id).ToListAsync());
@@ -246,7 +247,7 @@ namespace Service.Implement
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 return false;
             }
@@ -511,7 +512,7 @@ namespace Service.Implement
 
         public async Task<object> GetUsers()
         {
-            return await _context.Users.Where(x => x.RoleID != 1).Select(x => new { x.ID, x.Username }).ToListAsync();
+            return await _context.Users.Where(x => x.IsShow && x.RoleID != 1).Select(x => new { x.ID, x.Username }).ToListAsync();
         }
 
         public async Task<object> GetUserByProjectID(int id)
@@ -525,8 +526,8 @@ namespace Service.Implement
                     room = item.Project.Room,
                     title = item.Project.Name,
                     createdBy = item.Project.CreatedBy,
-                    selectedManager = await _context.Managers.Include(x => x.User).Where(x => x.ProjectID == id).Select(x => new { x.User.ID,  x.User.Username }).ToArrayAsync(),
-                    selectedMember = await _context.TeamMembers.Include(x => x.User).Where(x => x.ProjectID == id).Select(x => new {x.User.ID,  x.User.Username }).ToArrayAsync(),
+                    selectedManager = await _context.Managers.Include(x => x.User).Where(x => x.User.IsShow && x.ProjectID == id).Select(x => new { x.User.ID,  x.User.Username }).ToArrayAsync(),
+                    selectedMember = await _context.TeamMembers.Include(x => x.User).Where(x => x.User.IsShow && x.ProjectID == id).Select(x => new {x.User.ID,  x.User.Username }).ToArrayAsync(),
                 };
             }
             catch (Exception)
@@ -551,10 +552,10 @@ namespace Service.Implement
                 {
                     x.ID,
                     x.Name,
-                    Manager = x.TeamMembers.Select(a => a.User.Username).ToArray(),
-                    ManagerID = x.TeamMembers.Select(a => a.User.ID).ToArray(),
-                    Members = x.TeamMembers.Select(a => a.User.Username).ToArray(),
-                    MemberIDs = x.TeamMembers.Select(a => a.User.ID).ToArray(),
+                    Manager = x.TeamMembers.Where(a=> a.User.IsShow).Select(a => a.User.Username).ToArray(),
+                    ManagerID = x.TeamMembers.Where(a => a.User.IsShow).Select(a => a.User.ID).ToArray(),
+                    Members = x.TeamMembers.Where(a => a.User.IsShow).Select(a => a.User.Username).ToArray(),
+                    MemberIDs = x.TeamMembers.Where(a => a.User.IsShow).Select(a => a.User.ID).ToArray(),
                     x.CreatedBy
                 }).ToListAsync();
             model = model.Where(_ => _.ManagerID.Contains(userid) || _.MemberIDs.Contains(userid) || _.CreatedBy == userid).ToList();

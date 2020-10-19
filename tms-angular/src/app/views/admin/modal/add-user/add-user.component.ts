@@ -2,6 +2,7 @@ import { Component, OnInit, Input } from '@angular/core';
 import { UserService } from 'src/app/_core/_service/user.service';
 import { AlertifyService } from 'src/app/_core/_service/alertify.service';
 import { NgbActiveModal } from '@ng-bootstrap/ng-bootstrap';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-add-user',
@@ -34,7 +35,8 @@ export class AddUserComponent implements OnInit {
         password: '',
         email: '',
         roleid: 0,
-        isLeader: false
+        isLeader: false,
+        systemCode: environment.systemCode
       }
     }
   }

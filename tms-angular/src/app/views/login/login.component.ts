@@ -2,13 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { AuthService } from '../../_core/_service/auth.service';
 import { AlertifyService } from '../../_core/_service/alertify.service';
 import { Router, ActivatedRoute, RouterStateSnapshot } from '@angular/router';
+import { UserForLogin } from 'src/app/_core/_model/user';
+import { environment } from 'src/environments/environment';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
-  user: any = {};
+  user: UserForLogin = {
+    username: '',
+    password: '',
+    systemCode: environment.systemCode
+  };
   uri: any;
   routerLinkAdmin = [
     '/admin/oc',

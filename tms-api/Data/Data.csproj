@@ -89,6 +89,30 @@
     <Compile Remove="Migrations\20200526091717_Update1.1.5.Designer.cs" />
     <Compile Remove="Migrations\20200527005542_Update1.1.7.cs" />
     <Compile Remove="Migrations\20200527005542_Update1.1.7.Designer.cs" />
+    <Compile Remove="Migrations\20201009055045_AddSignInHistoryTblver1.0.1.cs" />
+    <Compile Remove="Migrations\20201009055045_AddSignInHistoryTblver1.0.1.Designer.cs" />
+    <Compile Remove="Migrations\20201017052603_version2.1.0.cs" />
+    <Compile Remove="Migrations\20201017052603_version2.1.0.Designer.cs" />
+    <Compile Remove="Migrations\20201017052723_version2.1.0.cs" />
+    <Compile Remove="Migrations\20201017052723_version2.1.0.Designer.cs" />
+    <Compile Remove="Migrations\20201017052936_version2.1.0.cs" />
+    <Compile Remove="Migrations\20201017052936_version2.1.0.Designer.cs" />
+    <Compile Remove="Migrations\20201017054949_version2.1.0.cs" />
+    <Compile Remove="Migrations\20201017054949_version2.1.0.Designer.cs" />
+    <Compile Remove="Migrations\20201017055635_version2.1.0.cs" />
+    <Compile Remove="Migrations\20201017055635_version2.1.0.Designer.cs" />
+    <Compile Remove="Migrations\20201017074603_version2.1.2.cs" />
+    <Compile Remove="Migrations\20201017074603_version2.1.2.Designer.cs" />
+    <Compile Remove="Migrations\20201017080459_version2.1.2.cs" />
+    <Compile Remove="Migrations\20201017080459_version2.1.2.Designer.cs" />
+    <Compile Remove="Migrations\20201017090953_version2.1.3.cs" />
+    <Compile Remove="Migrations\20201017090953_version2.1.3.Designer.cs" />
+    <Compile Remove="Migrations\20201017091704_version2.1.4.cs" />
+    <Compile Remove="Migrations\20201017091704_version2.1.4.Designer.cs" />
+    <Compile Remove="Migrations\20201017091957_version2.1.4.cs" />
+    <Compile Remove="Migrations\20201017091957_version2.1.4.Designer.cs" />
+    <Compile Remove="Migrations\20201017092239_version2.1.4.cs" />
+    <Compile Remove="Migrations\20201017092239_version2.1.4.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

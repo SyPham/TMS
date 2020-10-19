@@ -6,15 +6,16 @@ using System.Text;
 
 namespace Data.Models
 {
-  public  class Room
+   public class SystemCode
     {
+        public SystemCode()
+        {
+            this.DateTime = DateTime.UtcNow;
+        }
         [Key]
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
-        public int ProjectID { get; set; }
-        public Project Project { get; set; }
         public string Name { get; set; }
-        public bool Type { get; set; }
-
+        public DateTime DateTime { get; set; }
     }
 }

@@ -54,7 +54,7 @@
           </thead>
           <tbody>
             <tr *ngFor="let item of data; let i = index" >
-              <td>{{(pagination.currentPage - 1) * pagination.itemsPerPage + data.index + 1}}</td>
+              <td>{{(pagination.currentPage - 1) * pagination.itemsPerPage + i + 1}}</td>
               <td>{{item.Username}}</td>
               <td>{{item.Email}}</td>
               <td>{{item.RoleName}}</td>

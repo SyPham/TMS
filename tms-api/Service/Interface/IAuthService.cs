@@ -13,7 +13,8 @@ namespace Service.Interface
         Task<User> FindByNameAsync(string username);
         Task<User> GetById(int Id);
         Task<Role> GetRolesAsync(int role);
-
+        Task<bool> SignInHistory(SignInHistory signInHistory);
+        Task<object> GetSignInHistory();
         Task<User> Edit(string username);
     }
 }

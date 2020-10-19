@@ -26,11 +26,16 @@ namespace Data.Models
         public string AccessTokenLineNotify { get; set; }
         public byte[] ImageBase64 { get; set; }
         public bool isLeader { get; set; }
+        public bool IsShow { get; set; }
+        public int DeleteBy { get; set; }
+        public DateTime ModifyTime { get; set; }
         public virtual Role Role { get; set; }
         public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
+        public virtual ICollection<UserSystem> UserSystems { get; set; }
         public virtual ICollection<Follow> Follows { get; set; }
         public virtual ICollection<Tag> Tags { get; set; }
+        public virtual ICollection<OCUser> OCUsers { get; set; }
         public virtual ICollection<Deputy> Deputies { get; set; }
         public virtual ICollection<TeamMember> TeamMembers { get; set; }
         public virtual ICollection<Manager> Managers { get; set; }

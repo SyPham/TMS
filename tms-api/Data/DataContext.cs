@@ -1,4 +1,6 @@
-﻿using Data.Models;
+﻿using Data.Extensions;
+using Data.Models;
+using Data.ViewModel.Task;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
@@ -9,7 +11,7 @@ namespace Data
     {
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
-        public DbSet<Task> Tasks { get; set; }
+        public DbSet<Data.Models.Task> Tasks { get; set; }
         public DbSet<Project> Projects { get; set; }
         public DbSet<Manager> Managers { get; set; }
         public DbSet<Tag> Tags { get; set; }
@@ -33,69 +35,141 @@ namespace Data
         public DbSet<UserJoinHub> UserJoinHubs { get; set; }
         public DbSet<UploadImage> UploadImages { get; set; }
         public DbSet<CheckTask> CheckTasks { get; set; }
-        public DataContext(DbContextOptions<DataContext> options) : base(options)
-        {
-        }
+        public DbSet<SystemCode> SystemCodes { get; set; }
+        public DbSet<UserSystem> UserSystems { get; set; }
+        public DbSet<SignInHistory> SignInHistories { get; set; }
+        public DataContext(DbContextOptions<DataContext> options) : base(options) { }
         protected override void OnModelCreating(ModelBuilder builder)
         {
             builder.Entity<OCUser>().HasKey(ba => new { ba.UserID, ba.OCID });
-            builder.Entity<User>() //Tag
-            .HasMany(u => u.Projects)
-            .WithOne(c => c.User)
-            .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Task>() //Tag
+
+            builder.Entity<User>()
+             .HasMany(u => u.Tags)
+             .WithOne(c => c.User)
+             .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<User>()
+                      .HasMany(u => u.NotificationDetails)
+                      .WithOne(c => c.User)
+                      .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<User>()
+                    .HasMany(u => u.Projects)
+                    .WithOne(c => c.User)
+                    .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<User>()
+                                .HasMany(u => u.UserSystems)
+                                .WithOne(c => c.User)
+                                .OnDelete(DeleteBehavior.ClientCascade);
+
+          
+            builder.Entity<User>()
+                .HasMany(u => u.Follows)
+                .WithOne(c => c.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<User>()
+           .HasMany(u => u.Deputies)
+           .WithOne(c => c.User)
+           .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<User>()
+                .HasMany(u => u.TeamMembers)
+                .WithOne(c => c.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<User>()
+                          .HasMany(u => u.Managers)
+                          .WithOne(c => c.User)
+                          .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<User>()
+                .HasMany(u => u.Tasks)
+                .WithOne(c => c.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<Project>()
+                          .HasMany(u => u.Tasks)
+                          .WithOne(c => c.Project)
+                          .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<OC>()
+                   .HasMany(u => u.OCUsers)
+                   .WithOne(c => c.OC)
+                   .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<OC>()
+                  .HasMany(u => u.Tasks)
+                  .WithOne(c => c.OC)
+                  .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<User>()
+                   .HasMany(u => u.OCUsers)
+                   .WithOne(c => c.User)
+                   .OnDelete(DeleteBehavior.ClientCascade);
+
+
+            builder.Entity<Data.Models.Task>()
                 .HasMany(u => u.Tags)
                 .WithOne(c => c.Task)
-                .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Task>() //Tag
-                .HasMany(u => u.Deputies)
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+
+
+            builder.Entity<Data.Models.Task>()
+                .HasOne(u => u.Tutorial)
                 .WithOne(c => c.Task)
-                .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Task>() // Project
-               .HasOne(u => u.Project)
-               .WithMany(c => c.Tasks)
-               .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Task>() //OC
-             .HasOne(u => u.OC)
-             .WithMany(c => c.Tasks)
-             .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Task>() //OC
-              .HasOne(u => u.User)
-              .WithMany(c => c.Tasks)
-              .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Task>() //Tutorial
-             .HasOne(u => u.Tutorial)
-             .WithOne(c => c.Task)
-             .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Task>() //Tutorial
-              .HasMany(u => u.Tags)
-              .WithOne(c => c.Task)
-          .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.ClientCascade);
 
-            builder.Entity<Tag>() //Tutorial
-              .HasOne(u => u.Task)
-              .WithMany(c => c.Tags)
-          .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Tutorial>() //Tutorial
-              .HasOne(u => u.Task)
-              .WithOne(c => c.Tutorial)
-              .OnDelete(DeleteBehavior.NoAction);
-            builder.Entity<Follow>() //Task
-              .HasOne(u => u.Task)
-              .WithMany(c => c.Follows)
-              .OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Data.Models.Task>()
+                 .HasMany(u => u.Deputies)
+                 .WithOne(c => c.Task)
+                 .OnDelete(DeleteBehavior.ClientCascade);
 
-            builder.Entity<Follow>() //user
-                .HasOne(u => u.User)
-                .WithMany(c => c.Follows)
-                .OnDelete(DeleteBehavior.NoAction);
+            builder.Entity<Data.Models.Task>()
+                 .HasMany(u => u.Follows)
+                 .WithOne(c => c.Task)
+                 .OnDelete(DeleteBehavior.ClientCascade);
 
-            //foreach (var relationship in builder.Model.GetEntityTypes().SelectMany(e => e.GetForeignKeys()))
-            //{
-            //    relationship.DeleteBehavior = DeleteBehavior.NoAction;
-            //}
+            builder.Entity<Data.Models.Task>()
+                .HasMany(u => u.Comments)
+                .WithOne(c => c.Task)
+                .OnDelete(DeleteBehavior.ClientCascade);
 
-            //base.OnModelCreating(builder);
+            builder.Entity<Data.Models.Comment>()
+                 .HasMany(u => u.CommentDetails)
+                 .WithOne(c => c.Comment)
+                 .OnDelete(DeleteBehavior.ClientCascade);
+
+
+            builder.Entity<Project>()
+              .HasMany(u => u.Tutorials)
+              .WithOne(c => c.Project)
+              .OnDelete(DeleteBehavior.ClientCascade);
+
+
+            builder.Entity<Project>()
+              .HasMany(u => u.Managers)
+              .WithOne(c => c.Project)
+              .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<Project>()
+            .HasMany(u => u.TeamMembers)
+            .WithOne(c => c.Project)
+            .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<Project>()
+           .HasMany(u => u.Tasks)
+           .WithOne(c => c.Project)
+           .OnDelete(DeleteBehavior.ClientCascade);
+
+            builder.Entity<Project>()
+           .HasOne(u => u.RoomTable)
+           .WithOne(c => c.Project)
+           .OnDelete(DeleteBehavior.ClientCascade);
+
+
         }
     }
 }

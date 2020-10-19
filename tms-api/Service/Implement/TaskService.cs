@@ -1988,6 +1988,11 @@ namespace Service.Implement
                                 .Include(x => x.Project).ThenInclude(x => x.TeamMembers)
                                 .Include(x => x.OC)
                                 .Include(x => x.Tutorial)
+                                .Where(x=> 
+                                x.User.IsShow == true
+                                || x.Tags.Any(x=>x.User.IsShow)
+                                || x.Follows.Any(x=>x.User.IsShow)
+                                || x.Deputies.Any(x=>x.User.IsShow))
                                 .AsQueryable();
             return listTasks;
         }
@@ -2210,6 +2215,8 @@ namespace Service.Implement
                     .Where(x =>
                                (x.Tags.Select(x => x.UserID).Contains(userid)
                                || x.Deputies.Select(x => x.UserID).Contains(userid)
+                               || x.Project.Managers.Select(x => x.UserID).Contains(userid)
+                               || x.Project.TeamMembers.Select(x => x.UserID).Contains(userid)
                                || x.FromWhoID == userid
                                || x.CreatedBy == userid)
                                && x.Status == false && x.Tags.Count > 0
@@ -2339,7 +2346,8 @@ namespace Service.Implement
                 .Where(x => x.JobTypeID.Equals(jobtype) && x.ProjectID == projectid && x.Status == false)
                 .Where(x =>
                               (x.Tags.Select(x => x.UserID).Contains(userid)
-                               || x.Deputies.Select(x => x.UserID).Contains(userid)
+                               || x.Project.Managers.Select(x=>x.UserID).Contains(userid)
+                               || x.Project.TeamMembers.Select(x=>x.UserID).Contains(userid)
                                || x.FromWhoID == userid
                                || x.CreatedBy == userid)
                    )

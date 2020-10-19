@@ -8,6 +8,12 @@ export interface User {
   Role: number;
   ListOcs: [];
 }
+export interface UserForLogin {
+  username: string;
+  password: string;
+  systemCode: number;
+
+}
 export interface UserGetAll {
    ID: number;
    Username: string;

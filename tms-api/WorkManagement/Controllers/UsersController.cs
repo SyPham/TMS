@@ -24,10 +24,12 @@ namespace WorkManagement.Controllers
         private readonly IUserService _userService;
 
         private IHostingEnvironment _currentEnvironment;
-        public UsersController(IUserService userService, IHostingEnvironment currentEnvironment)
+        private IMailExtension _mailExtension;
+        public UsersController(IUserService userService, IMailExtension mailExtension,IHostingEnvironment currentEnvironment)
         {
             _userService = userService;
             _currentEnvironment = currentEnvironment;
+            _mailExtension = mailExtension;
         }
 
         [HttpGet]
@@ -78,6 +80,12 @@ namespace WorkManagement.Controllers
             }
             return Ok(await _userService.ChangeAvatar(userID, uniqueFileName));
         }
+        
+         [HttpPut("{userId}/{password}")]
+        public async Task<IActionResult> ChangePassword(int userId, string password)
+        {
+            return Ok(await _userService.ChangePassword(userId, password));
+        }
         [HttpPost]
         public async Task<IActionResult> ChangedAvatar(UploadDto img)
         {
@@ -89,7 +97,7 @@ namespace WorkManagement.Controllers
             return Ok(await _userService.UpdateTokenLineForUser(token, userid));
         }
         [HttpPost]
-        public async Task<IActionResult> Update(User user )
+        public async Task<IActionResult> Update(UpdateUserDto user )
         {
             return Ok(await _userService.Update(user));
         }
@@ -136,11 +144,11 @@ namespace WorkManagement.Controllers
                 pageSize
             });
         }
-        [HttpGet("{page}/{pageSize}/{keyword}")]
-        [HttpGet("{page}/{pageSize}")]
-        public async Task<ActionResult> GetAllUsers(int page, int pageSize, string keyword = "")
+        [HttpGet("{systemCode}/{page}/{pageSize}")]
+        [HttpGet("{systemCode}/{page}/{pageSize}/{keyword}")]
+        public async Task<ActionResult> GetAllUsers(int systemCode, int page, int pageSize, string keyword = "")
         {
-            var model = await _userService.GetAllPaging(page, pageSize, keyword);
+            var model = await _userService.GetAllPaging(systemCode, page, pageSize, keyword);
             Response.AddPagination(model.CurrentPage, model.PageSize, model.TotalCount, model.TotalPages);
             return Ok(model);
         }
@@ -149,8 +157,17 @@ namespace WorkManagement.Controllers
         public async Task<ActionResult> ResetPassword(int id)
         {
             var model = await _userService.ResetPassword(id);
-            return Ok(model);
+            await _mailExtension.SendEmailAsync(model.Email, "Reset Password", $"Password: {model.Password}");
+            return Ok(model.Status);
         }
+        [HttpPost]
+        public async Task<ActionResult> ResetPassword(UserResetPasswordVM user)
+        {
+            var model = await _userService.ResetPassword(user);
+            await _mailExtension.SendEmailAsync(model.Email, "Reset Password", $"Password: {model.Password}");
+            return Ok(model.Status);
+        }
+        
         [HttpGet]
         public async Task<ActionResult> GetUsernames()
         {

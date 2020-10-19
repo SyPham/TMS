@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -17,6 +18,6 @@ namespace Service.Dto
         public bool IsLeader { get; set; }
         public bool SubscribeLine { get; set; }
         public string EmployeeID { get; set; }
-
+        public List<int> Systems { get; set; }
     }
 }

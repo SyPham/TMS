@@ -22,8 +22,7 @@ namespace Data.Models
         public int Level { get; set; }
         public int DepartmentID { get; set; }
         public int? ProjectID { get; set; }
-        [ForeignKey("User")]
-        public int CreatedBy { get; set; }
+      
         public int? OCID { get; set; }
         public int FromWhoID { get; set; }
         [MaxLength(2)]
@@ -35,13 +34,15 @@ namespace Data.Models
         public DateTime CreatedDate { get; set; }
         public Enum.PeriodType periodType { get; set; }
         public Enum.JobType JobTypeID { get; set; }
+        [ForeignKey("User")]
+        public int CreatedBy { get; set; }
         public virtual User User { get; set; } 
         public virtual ICollection<Tag> Tags { get; set; } 
         public virtual ICollection<Deputy> Deputies { get; set; } 
         public virtual ICollection<Follow> Follows { get; set; } 
         public virtual ICollection<Comment> Comments { get; set; }
-        public virtual Project Project { get; set; } 
         public virtual Tutorial Tutorial { get; set; } 
+        public virtual Project Project { get; set; } 
         public virtual OC OC { get; set; }
         public string GroupCode { get; set; }
     }

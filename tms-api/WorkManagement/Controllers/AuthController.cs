@@ -83,15 +83,54 @@ namespace WorkManagement.Controllers
                     ListOCs = await _oCService.ListOCIDofUser(user.OCID),
                     IsLeader = user.isLeader,
                     image = user.ImageBase64,
-                    SubscribeLine = subscribeLine
+                    SubscribeLine = subscribeLine,
+                    Systems = user.UserSystems.Where(x=>x.Status == true).Select(x=>x.SystemID).ToList()
                 },
                 //Menus = JsonConvert.SerializeObject(await _authService.GetMenusAsync(user.Role))
             };
+            var token = GenerateJwtToken(result);
+            if (userForLoginDto.SystemCode == 0)
+            {
+                return Ok(new
+                {
+                    token,
+                    user = userprofile
+                });
+            }
+            await this._authService.SignInHistory(new SignInHistory
+            {
+                Token = token,
+                UserID = user.ID,
+                Username = user.Username,
+                SystemCode = userForLoginDto.SystemCode,
+                Host = $"{Request.HttpContext.Connection.RemoteIpAddress.ToString()}:{Request.HttpContext.Connection.RemotePort.ToString()}",
+                LoginTime = DateTime.Now,
+                CreatedDate = DateTime.Now
+            });
             return Ok(new
             {
-                token = GenerateJwtToken(result),
+                token,
                 user = userprofile
             });
+
+        }
+        
+        [HttpGet("GetSignInHistory")]
+        public async Task<IActionResult> GetSignInHistory()
+        {
+            var res = await this._authService.GetSignInHistory();
+            return Ok(res);
+
+        }
+        [HttpPut("SignOut")]
+        public async Task<IActionResult> SignOut([FromBody] SignInHistory signInHistory)
+        {
+            if (signInHistory.SystemCode == 0)
+            {
+                return Ok(true);
+            }
+            var res = await this._authService.SignInHistory(signInHistory);
+            return Ok(res);
 
         }
         private int checkRole(int role, int level)

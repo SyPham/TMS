@@ -30,14 +30,14 @@ export class UserService {
   create(create) { return this.http.post(`${this.baseUrl}Users/Create`, create); }
   rename(edit) { return this.http.post(`${this.baseUrl}Users/rename`, edit, {headers: httpOptions.headers}); }
   getUsers(page = 1, pageSize = 10, search = '%20') {
-    return this.http.get(`${this.baseUrl}Users/GetAllPaging/${page}/${pageSize}/${search}`);
+    return this.http.get(`${this.baseUrl}Users/GetAllPaging/${environment.systemCode}/${page}/${pageSize}/${search}`);
   }
   getAllUsers(page?, pageSize? ): Observable<PaginatedResult<UserGetAll[]>> {
     const paginatedResult: PaginatedResult<UserGetAll[]> = new PaginatedResult<
     UserGetAll[]
     >();
     return this.http
-      .get<UserGetAll[]>(`${this.baseUrl}Users/GetAllUsers/${page}/${pageSize}`, {
+      .get<UserGetAll[]>(`${this.baseUrl}Users/GetAllUsers/${environment.systemCode}/${page}/${pageSize}`, {
         observe: 'response'
       })
       .pipe(
@@ -57,7 +57,7 @@ export class UserService {
     UserGetAll[]
     >();
     return this.http
-      .get<UserGetAll[]>(`${this.baseUrl}Users/GetAllUsers/${page}/${pageSize}/${text}`, {
+      .get<UserGetAll[]>(`${this.baseUrl}Users/GetAllUsers/${environment.systemCode}/${page}/${pageSize}/${text}`, {
         observe: 'response'
       })
       .pipe(

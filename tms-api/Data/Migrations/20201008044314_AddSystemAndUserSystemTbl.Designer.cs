@@ -4,14 +4,16 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201008044314_AddSystemAndUserSystemTbl")]
+    partial class AddSystemAndUserSystemTbl
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -448,44 +450,6 @@ namespace Data.Migrations
                     b.ToTable("Rooms");
                 });
 
-            modelBuilder.Entity("Data.Models.SignInHistory", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Host")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("LastRequestEndTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("LoginTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("SystemCode")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Token")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("UserID")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Username")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("ID");
-
-                    b.HasIndex("SystemCode");
-
-                    b.ToTable("SignInHistories");
-                });
-
             modelBuilder.Entity("Data.Models.SystemCode", b =>
                 {
                     b.Property<int>("ID")
@@ -886,13 +850,13 @@ namespace Data.Migrations
             modelBuilder.Entity("Data.Models.OCUser", b =>
                 {
                     b.HasOne("Data.Models.OC", "OC")
-                        .WithMany("OCUsers")
+                        .WithMany()
                         .HasForeignKey("OCID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("Data.Models.User", "User")
-                        .WithMany("OCUsers")
+                        .WithMany()
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -912,15 +876,6 @@ namespace Data.Migrations
                     b.HasOne("Data.Models.Project", null)
                         .WithOne("RoomTable")
                         .HasForeignKey("Data.Models.Room", "ProjectID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("Data.Models.SignInHistory", b =>
-                {
-                    b.HasOne("Data.Models.SystemCode", "SystemCodeTbl")
-                        .WithMany()
-                        .HasForeignKey("SystemCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
@@ -983,7 +938,7 @@ namespace Data.Migrations
                     b.HasOne("Data.Models.Task", "Task")
                         .WithOne("Tutorial")
                         .HasForeignKey("Data.Models.Tutorial", "TaskID")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.NoAction);
                 });
 
             modelBuilder.Entity("Data.Models.User", b =>
@@ -1004,7 +959,7 @@ namespace Data.Migrations
                         .IsRequired();
 
                     b.HasOne("Data.Models.User", "User")
-                        .WithMany("UserSystems")
+                        .WithMany()
                         .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
