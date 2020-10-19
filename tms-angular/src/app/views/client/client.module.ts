@@ -57,6 +57,7 @@ import { RoutineDetailComponent } from './modals/routine-detail/routine-detail.c
 import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { ContextMenuModule  } from '@syncfusion/ej2-angular-navigations';
 import { ClipboardModule } from 'ngx-clipboard';
+import { RoutineChildComponent } from './routine/routine-child/routine-child.component';
 
 @NgModule({
   imports: [
@@ -115,6 +116,7 @@ import { ClipboardModule } from 'ngx-clipboard';
     ContentEditableFormDirective,
     TreeComponent,
     RoutineDetailComponent,
+    RoutineChildComponent,
   ],
   providers: [
     RoutineResolver

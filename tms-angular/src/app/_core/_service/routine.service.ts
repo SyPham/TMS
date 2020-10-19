@@ -42,7 +42,9 @@ export class RoutineService {
       })
     );
   }
-
+  routineChild(taskCode) {
+    return this.http.get(`${this.baseUrl}Tasks/RoutineChild/${taskCode}`);
+  }
   getBeAssigned() {
     return this.http.get(`${this.baseUrl}Tasks/GetListUser/0`).pipe(
       map(response => {

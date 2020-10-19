@@ -17,6 +17,8 @@ import { TodolistResolver } from 'src/app/_core/_resolvers/todolist.resolvers';
 import { HistoryResolver } from 'src/app/_core/_resolvers/history.resolvers';
 import { FollowResolver } from 'src/app/_core/_resolvers/follow.resolvers';
 import { AuthGuard } from 'src/app/_core/_guards/auth.guard';
+import { RoutineDetailComponent } from './modals/routine-detail/routine-detail.component';
+import { RoutineChildComponent } from './routine/routine-child/routine-child.component';
 
 const routes: Routes = [
   {
@@ -78,6 +80,13 @@ const routes: Routes = [
         path: 'routine',
         component: RoutineComponent,
         resolve: { ocs: RoutineResolver },
+        data: {
+          title: 'Rotine'
+        }
+      },
+      {
+        path: 'routine/detail/:code',
+        component: RoutineChildComponent,
         data: {
           title: 'Rotine'
         }

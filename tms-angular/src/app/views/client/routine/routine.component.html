@@ -44,7 +44,7 @@
             <e-column field="From" headerText="From"></e-column>
             <e-column field="Detail" headerText="Detail" width="120">
             <ng-template #template let-data>
-              <button class="btn btn-sm btn-primary" (click)='openRoutineDetailModal(data)'> <i class="fa fa-info"></i> Detail</button>
+              <button class="btn btn-sm btn-primary" [routerLink]="['/routine/detail/', data.TaskCode]" > <i class="fa fa-info"></i> Detail</button>
             </ng-template>
           </e-column>
           </e-columns>

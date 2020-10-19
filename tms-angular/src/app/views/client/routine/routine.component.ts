@@ -24,6 +24,7 @@ import { CommentComponent } from '../modals/comment/comment.component';
 import { ClientRouter } from 'src/app/_core/enum/ClientRouter';
 import { RoutineDetailComponent } from '../modals/routine-detail/routine-detail.component';
 import { AddTask } from 'src/app/_core/_model/add.task';
+import { Subscription } from 'rxjs';
 declare let $: any;
 @Component({
   selector: 'app-routine',
@@ -39,7 +40,7 @@ export class RoutineComponent implements OnInit, OnDestroy {
   public taskId: number;
   public showTasks: boolean;
   public parentId: number;
-  public rowSelectedTaskIndex = 0;
+  public rowSelectedTaskIndex: number;
   public showDetailModal = false;
   public toolbarOptions: any[];
   public toolbarOptionsTasks: any[];
@@ -56,6 +57,7 @@ export class RoutineComponent implements OnInit, OnDestroy {
   ocId = 0;
   jobName: string;
   itemDetailModal: any;
+  subscriptions: Subscription = new Subscription();
   constructor(
     config: NgbModalConfig,
     private modalService: NgbModal,
@@ -73,7 +75,7 @@ export class RoutineComponent implements OnInit, OnDestroy {
     this.checkRole();
   }
   ngOnDestroy() {
-    this.addTaskService.changeMessage(new AddTask());
+    this.subscriptions.unsubscribe();
   }
   optionGridTree() {
     this.filterSettings = { type: 'CheckBox' };
@@ -95,10 +97,9 @@ export class RoutineComponent implements OnInit, OnDestroy {
     this.treeGridObj.selectRows([this.rowSelectedTaskIndex]);
     if (this.showDetailModal) {
       const item = this.treeGridObj.getSelectedRecords()[0];
-      this.itemDetailModal = item;
-      console.log('data bound', this.itemDetailModal);
+      console.log('data bound', item);
       this.modalService.dismissAll();
-      this.openRoutineDetailModal(this.itemDetailModal);
+      this.openRoutineDetailModal(item);
     }
 
   }
@@ -107,12 +108,12 @@ export class RoutineComponent implements OnInit, OnDestroy {
     this.route.data.subscribe(data => {
       this.ocs = data.ocs;
       // $('#overlay').fadeOut();
-      this.addTaskService.currentMessage.subscribe((res: AddTask) => {
+      this.subscriptions.add(this.addTaskService.currentMessage.subscribe((res: AddTask) => {
         if (res.Jobtype === JobType.Routine) {
           this.ocId = res.OcId;
           this.getTasks();
         }
-      });
+      }));
       this.onRouteChange();
     });
   }
@@ -467,6 +468,7 @@ export class RoutineComponent implements OnInit, OnDestroy {
     modalRef.result.then((result) => {
       // console.log('openAddMainTaskModal', result)
     }, (reason) => {
+      this.showDetailModal = false;
     });
     this.jobtypeService.changeMessage(JobType.Routine);
   }
@@ -479,6 +481,7 @@ export class RoutineComponent implements OnInit, OnDestroy {
     modalRef.result.then((result) => {
       // console.log('openAddSubTaskModal', result);
     }, (reason) => {
+      this.showDetailModal = false;
     });
     this.jobtypeService.changeMessage(JobType.Routine);
   }
@@ -492,6 +495,7 @@ export class RoutineComponent implements OnInit, OnDestroy {
       // console.log('openEditTaskModal', result);
     }, (reason) => {
       this.parentId = 0;
+      this.showDetailModal = false;
     });
     this.jobtypeService.changeMessage(JobType.Routine);
   }

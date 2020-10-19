@@ -40,6 +40,15 @@ namespace WorkManagement.Controllers
 
             return Ok(await _taskService.Todolist(sort, priority, userID, start, end, weekdays, monthly, quarterly));
         }
+        
+        [HttpGet("{taskCode}")]
+        public async Task<IActionResult> RoutineChild(string taskCode)
+        {
+            string token = Request.Headers["Authorization"];
+            var userID = JWTExtensions.GetDecodeTokenByProperty(token, "nameid").ToInt();
+            if (userID == 0) return NotFound();
+            return Ok(await _taskService.RoutineChild(taskCode));
+        }
         [HttpGet("{ocid}/{sort}")]
         [HttpGet("{ocid}/{priority}/{sort}")]
         [HttpGet("{ocid}")]

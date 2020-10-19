@@ -33,7 +33,8 @@ namespace BotSignalr
                                   builder =>
                                   {
                                       builder.WithOrigins("https://notify-bot.line.me",
-                                                          "http://10.4.4.224:106");
+                                                            "http://localhost:4200",
+                                                          "http://10.4.4.224:100");
                                   });
             });
         }

@@ -2774,6 +2774,11 @@ namespace Service.Implement
             throw new NotImplementedException();
         }
 
-
+        public async Task<object> RoutineChild(string taskCode)
+        {
+            var model = await GetAllTasks().Where(x => x.Code.Equals(taskCode)).ToListAsync();
+             var all = _mapper.Map<List<TreeViewTask>>(model).ToList();
+            return all;
+        }
     }
 }

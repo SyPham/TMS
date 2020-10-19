@@ -89,6 +89,6 @@
     "codelyzer"
   ],
   "angularCompilerOptions": {
-    "enableIvy": false
+    "enableIvy": true
   }
 }
