@@ -139,6 +139,7 @@ namespace TMS
             services.AddScoped<IUserSystemService, UserSystemService>();
             //extension
             services.AddScoped<IMailExtension, MailExtension>();
+            services.AddScoped<IEmailService, EmailService>();
 
         }
 
@@ -177,7 +178,6 @@ namespace TMS
                 });
                 // app.UseHsts();
             }
-
             app.UseHttpsRedirection();
             app.UseRouting();
             app.UseCors("CorsPolicy");
@@ -190,6 +190,7 @@ namespace TMS
 
             app.UseAuthentication();
             app.UseAuthorization();
+            app.UseMiddleware<JwtMiddleware>();
 
             app.UseEndpoints(endpoints =>
             {

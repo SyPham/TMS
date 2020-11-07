@@ -14,6 +14,7 @@ using Service.Helpers;
 using Service.Interface;
 using TMS.Helpers;
 using static System.Net.Mime.MediaTypeNames;
+using AuthorizeAttribute = TMS.Helpers.AuthorizeAttribute;
 
 namespace TMS.Controllers
 {

@@ -44,18 +44,18 @@ namespace TMS.Controllers
             _mapper = mapper;
             _lineService = lineService;
         }
-        [HttpPost("register")]
-        public async Task<IActionResult> Register([FromBody] UserForRegisterDto userForRegisterDto)
-        {
-            userForRegisterDto.Username = userForRegisterDto.Username.ToLower();
+        //[HttpPost("register")]
+        //public async Task<IActionResult> Register([FromBody] UserForRegisterDto userForRegisterDto)
+        //{
+        //    userForRegisterDto.Username = userForRegisterDto.Username.ToLower();
 
-            if (await _authService.FindByNameAsync(userForRegisterDto.Username) != null)
-                return BadRequest("Username already exists");
+        //    if (await _authService.FindByNameAsync(userForRegisterDto.Username) != null)
+        //        return BadRequest("Username already exists");
 
-            var user = _mapper.Map<User>(userForRegisterDto);
-            var createdUser = await _authService.Register(user, userForRegisterDto.Password);
-            return CreatedAtRoute("GetUser", new { controller = "User", id = createdUser.ID }, userForRegisterDto);
-        }
+        //    var user = _mapper.Map<User>(userForRegisterDto);
+        //    var createdUser = await _authService.Register(user, userForRegisterDto.Password);
+        //    return CreatedAtRoute("GetUser", new { controller = "User", id = createdUser.ID }, userForRegisterDto);
+        //}
 
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]UserForLoginDto userForLoginDto)
@@ -227,6 +227,49 @@ namespace TMS.Controllers
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
         }
+        [HttpGet("{id}/refresh-tokens")]
+        public async Task<IActionResult> GetRefreshTokens(int id)
+        {
+            var user = await _authService.GetById(id);
+            if (user == null) return NotFound();
+
+            return Ok(user.RefreshTokens);
+        }
+        [HttpPost("register")]
+        public IActionResult Register(RegisterRequest model)
+        {
+            _authService.Register(model, Request.Headers["origin"]);
+            return Ok(new { message = "Registration successful, please check your email for verification instructions" });
+        }
+
+        [HttpPost("verify-email")]
+        public IActionResult VerifyEmail(VerifyEmailRequest model)
+        {
+            _authService.VerifyEmail(model.Token);
+            return Ok(new { message = "Verification successful, you can now login" });
+        }
+
+        [HttpPost("forgot-password")]
+        public IActionResult ForgotPassword(ForgotPasswordRequest model)
+        {
+            _authService.ForgotPassword(model, Request.Headers["origin"]);
+            return Ok(new { message = "Please check your email for password reset instructions" });
+        }
+
+        [HttpPost("validate-reset-token")]
+        public IActionResult ValidateResetToken(ValidateResetTokenRequest model)
+        {
+            _authService.ValidateResetToken(model);
+            return Ok(new { message = "Token is valid" });
+        }
+
+        [HttpPost("reset-password")]
+        public IActionResult ResetPassword(ResetPasswordRequest model)
+        {
+            _authService.ResetPassword(model);
+            return Ok(new { message = "Password reset successful, you can now login" });
+        }
+
 
         private void setTokenCookie(string token)
         {

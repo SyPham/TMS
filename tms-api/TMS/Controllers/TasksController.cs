@@ -13,6 +13,7 @@ using Service.Hub;
 using Service.Interface;
 using TMS.Helpers;
 using TMS.Hub;
+using AuthorizeAttribute = TMS.Helpers.AuthorizeAttribute;
 
 namespace TMS.Controllers
 {

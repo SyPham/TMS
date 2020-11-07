@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using TMS.Hub;
 using Microsoft.AspNetCore.SignalR;
 using Service.Hub;
+using AuthorizeAttribute = TMS.Helpers.AuthorizeAttribute;
 
 namespace TMS.Controllers
 {

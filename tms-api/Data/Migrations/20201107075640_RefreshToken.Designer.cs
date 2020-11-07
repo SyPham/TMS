@@ -4,14 +4,16 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20201107075640_RefreshToken")]
+    partial class RefreshToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -691,9 +693,6 @@ namespace Data.Migrations
                     b.Property<string>("AccessTokenLineNotify")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("Created")
-                        .HasColumnType("datetime2");
-
                     b.Property<int>("DeleteBy")
                         .HasColumnType("int");
 
@@ -724,32 +723,14 @@ namespace Data.Migrations
                     b.Property<byte[]>("PasswordHash")
                         .HasColumnType("varbinary(max)");
 
-                    b.Property<DateTime?>("PasswordReset")
-                        .HasColumnType("datetime2");
-
                     b.Property<byte[]>("PasswordSalt")
                         .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ResetToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("ResetTokenExpires")
-                        .HasColumnType("datetime2");
 
                     b.Property<int>("RoleID")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("Updated")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("Username")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("VerificationToken")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("Verified")
-                        .HasColumnType("datetime2");
 
                     b.Property<bool>("isLeader")
                         .HasColumnType("bit");

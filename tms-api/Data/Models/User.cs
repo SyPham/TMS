@@ -30,7 +30,15 @@ namespace Data.Models
         public bool isLeader { get; set; }
         public bool IsShow { get; set; }
         public int DeleteBy { get; set; }
+        public DateTime? Verified { get; set; }
+        public bool IsVerified => Verified.HasValue || PasswordReset.HasValue;
+        public string VerificationToken { get; set; }
+        public string ResetToken { get; set; }
+        public DateTime? ResetTokenExpires { get; set; }
         public DateTime ModifyTime { get; set; }
+        public DateTime? PasswordReset { get; set; }
+        public DateTime Created { get; set; } = DateTime.Now;
+        public DateTime? Updated { get; set; }
         public virtual Role Role { get; set; }
 
         public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
@@ -47,5 +55,9 @@ namespace Data.Models
 
         [JsonIgnore]
         public List<RefreshToken> RefreshTokens { get; set; }
+        public bool OwnsToken(string token)
+        {
+            return this.RefreshTokens?.Find(x => x.Token == token) != null;
+        }
     }
 }

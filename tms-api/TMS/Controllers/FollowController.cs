@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Service.Helpers;
 using Service.Interface;
 using TMS.Helpers;
+using AuthorizeAttribute = TMS.Helpers.AuthorizeAttribute;
 
 namespace TMS.Controllers
 {
