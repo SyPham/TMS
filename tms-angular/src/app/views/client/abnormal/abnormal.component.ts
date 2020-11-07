@@ -33,7 +33,7 @@ declare let $: any;
   styleUrls: ['./abnormal.component.css'],
   providers: [PageService, NgbModal]
 })
-export class AbnormalComponent implements OnInit {
+export class AbnormalComponent implements OnInit, OnDestroy {
 
   @ViewChild('treegridTasks')
   public treeGridObj: TreeGridComponent;
@@ -101,7 +101,7 @@ export class AbnormalComponent implements OnInit {
     });
   }
   getEnumKeyByEnumValue(myEnum, enumValue) {
-    let keys = Object.keys(myEnum).filter(x => myEnum[x] === enumValue);
+    const keys = Object.keys(myEnum).filter(x => myEnum[x] === enumValue);
     return keys.length > 0 ? keys[0] : null;
   }
   periodText(enumVal) {

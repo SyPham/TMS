@@ -1,4 +1,5 @@
-﻿using Data.Models;
+﻿using Data;
+using Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -16,5 +17,9 @@ namespace Service.Interface
         Task<bool> SignInHistory(SignInHistory signInHistory);
         Task<object> GetSignInHistory();
         Task<User> Edit(string username);
+
+        AuthenticateResponse Authenticate(AuthenticateRequest model, string ipAddress);
+        AuthenticateResponse RefreshToken(string token, string ipAddress);
+        bool RevokeToken(string token, string ipAddress);
     }
 }

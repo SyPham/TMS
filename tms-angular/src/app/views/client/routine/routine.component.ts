@@ -40,8 +40,6 @@ export class RoutineComponent implements OnInit, OnDestroy {
   public taskId: number;
   public showTasks: boolean;
   public parentId: number;
-  public rowSelectedTaskIndex: number;
-  public showDetailModal = false;
   public toolbarOptions: any[];
   public toolbarOptionsTasks: any[];
   public tasks: object;
@@ -52,11 +50,9 @@ export class RoutineComponent implements OnInit, OnDestroy {
   public currentUser = JSON.parse(localStorage.getItem('user')).User.ID;
   public contextMenuItems: object;
   public filterSettings: FilterSettingsModel;
-  private tutorialName: string;
   searchSettings: object;
   ocId = 0;
   jobName: string;
-  itemDetailModal: any;
   subscriptions: Subscription = new Subscription();
   constructor(
     config: NgbModalConfig,
@@ -73,6 +69,12 @@ export class RoutineComponent implements OnInit, OnDestroy {
     this.resolver();
     this.optionGridTree();
     this.checkRole();
+    this.subscriptions.add(this.addTaskService.currentMessage.subscribe((res: AddTask) => {
+      if (res.Jobtype === JobType.Routine) {
+        this.ocId = res.OcId;
+        this.getTasks();
+      }
+    }));
   }
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
@@ -93,27 +95,9 @@ export class RoutineComponent implements OnInit, OnDestroy {
       ignoreCase: true
     };
   }
-  dataBound() {
-    this.treeGridObj.selectRows([this.rowSelectedTaskIndex]);
-    if (this.showDetailModal) {
-      const item = this.treeGridObj.getSelectedRecords()[0];
-      console.log('data bound', item);
-      this.modalService.dismissAll();
-      this.openRoutineDetailModal(item);
-    }
-
-  }
   resolver() {
-    // $('#overlay').fadeIn();
     this.route.data.subscribe(data => {
       this.ocs = data.ocs;
-      // $('#overlay').fadeOut();
-      this.subscriptions.add(this.addTaskService.currentMessage.subscribe((res: AddTask) => {
-        if (res.Jobtype === JobType.Routine) {
-          this.ocId = res.OcId;
-          this.getTasks();
-        }
-      }));
       this.onRouteChange();
     });
   }
@@ -197,12 +181,6 @@ export class RoutineComponent implements OnInit, OnDestroy {
       );
     }
   }
-  follow(id) {
-    this.routineService.follow(id).subscribe(res => {
-      this.alertify.success('You have already followd this one!');
-      this.getTasks();
-    });
-  }
   checkRole() {
     if (this.ocLevel >= 3 && !this.isLeader) {
       this.toolbarOptionsTasks = [
@@ -211,34 +189,8 @@ export class RoutineComponent implements OnInit, OnDestroy {
         'CollapseAll',
         'ExcelExport',
         'Print',
-        { text: 'All columns', tooltipText: 'Show all columns', prefixIcon: 'e-add', id: 'AllColumns' },
-        { text: 'Default columns', tooltipText: 'Show default columns', prefixIcon: 'e-add', id: 'DefaultColumns' },
       ];
       this.contextMenuItems = [
-        // {
-        //   text: 'Add Tutorial Video',
-        //   iconCss: 'fa fa-plus-square',
-        //   target: '.e-content',
-        //   id: 'Tutorial'
-        // },
-        // {
-        //   text: 'Edit Tutorial',
-        //   iconCss: 'fa fa-wrench',
-        //   target: '.e-content',
-        //   id: 'EditTutorial'
-        // },
-        // {
-        //   text: 'Watch Video',
-        //   iconCss: 'fa fa-play',
-        //   target: '.e-content',
-        //   id: 'WatchVideo'
-        // },
-        // {
-        //   text: 'Follow',
-        //   iconCss: ' fa fa-bell',
-        //   target: '.e-content',
-        //   id: 'Follow'
-        // },
       ];
     } else {
       this.toolbarOptionsTasks = [
@@ -248,80 +200,15 @@ export class RoutineComponent implements OnInit, OnDestroy {
         'CollapseAll',
         'ExcelExport',
         'Print',
-        // { text: 'All columns', tooltipText: 'Show all columns', prefixIcon: 'e-add', id: 'AllColumns' },
-        // { text: 'Default columns', tooltipText: 'Show default columns', prefixIcon: 'e-add', id: 'DefaultColumns' },
       ];
       this.contextMenuItems = [
-        // {
-        //   text: 'Add Sub-Task',
-        //   iconCss: ' e-icons e-add',
-        //   target: '.e-content',
-        //   id: 'Add-Sub-Task'
-        // },
-        // {
-        //   text: 'Edit',
-        //   iconCss: ' e-icons e-edit',
-        //   target: '.e-content',
-        //   id: 'EditTask'
-        // },
         {
           text: 'Delete',
           iconCss: ' e-icons e-delete',
           target: '.e-content',
           id: 'DeleteTask'
         },
-        // {
-        //   text: 'Add Tutorial Video',
-        //   iconCss: 'fa fa-plus-square',
-        //   target: '.e-content',
-        //   id: 'Tutorial'
-        // },
-        // {
-        //   text: 'Edit Tutorial',
-        //   iconCss: 'fa fa-wrench',
-        //   target: '.e-content',
-        //   id: 'EditTutorial'
-        // },
-        // {
-        //   text: 'Watch Video',
-        //   iconCss: 'fa fa-play',
-        //   target: '.e-content',
-        //   id: 'WatchVideo'
-        // },
-        // {
-        //   text: 'Follow',
-        //   iconCss: ' fa fa-bell',
-        //   target: '.e-content',
-        //   id: 'Follow'
-        // },
-        // {
-        //   text: 'Unfollow',
-        //   iconCss: ' fa fa-bell-slash',
-        //   target: '.e-content',
-        //   id: 'Unfollow'
-        // }
       ];
-    }
-  }
-  getEnumKeyByEnumValue(myEnum, enumValue) {
-    const keys = Object.keys(myEnum).filter(x => myEnum[x] === enumValue);
-    return keys.length > 0 ? keys[0] : null;
-  }
-  periodText(enumVal) {
-    return this.getEnumKeyByEnumValue(PeriodType, Number(enumVal));
-  }
-  defaultColumnsTreegrid() {
-    const show = ['Follow', 'Priority', 'From', 'Task Name',
-      'Created Date', 'Finished DateTime',
-      'PIC', 'Status', 'Deputy', 'Watch Video', 'Period Type'];
-    for (const item of show) {
-      this.treeGridObj.showColumns([item, 'Ship Name']);
-    }
-  }
-  showAllColumnsTreegrid() {
-    const hide = ['Follow', 'Priority', 'From', 'Status', 'Watch Video', 'Deputy', 'Period Type'];
-    for (const item of hide) {
-      this.treeGridObj.hideColumns([item, 'Ship Name']);
     }
   }
   // event
@@ -336,65 +223,10 @@ export class RoutineComponent implements OnInit, OnDestroy {
       case 'Add New':
         this.openAddMainTaskModal();
         break;
-      case 'All columns':
-        this.showAllColumnsTreegrid();
-        break;
-      case 'Default columns':
-        this.defaultColumnsTreegrid();
-        break;
     }
   }
 
   contextMenuOpen(arg?: any): void {
-    // console.log('contextMenuOpen: ', arg);
-    // let data = arg.rowInfo.rowData;
-    // let users = [...data.Deputies, ...data.PICs].concat(data.FromWhoID);
-    // // console.log(users);
-    // if (data.VideoStatus) {
-    //   document
-    //     .querySelectorAll('li#WatchVideo')[0]
-    //     .setAttribute('style', 'display: block;');
-    //   document
-    //     .querySelectorAll('li#EditTutorial')[0]
-    //     .setAttribute('style', 'display: block;');
-    // } else {
-    //   document
-    //     .querySelectorAll('li#WatchVideo')[0]
-    //     .setAttribute('style', 'display: none;');
-    //   document
-    //     .querySelectorAll('li#EditTutorial')[0]
-    //     .setAttribute('style', 'display: none;');
-    // }
-    // if (data.Follow === 'Yes') {
-    //   document
-    //     .querySelectorAll('li#Unfollow')[0]
-    //     .setAttribute('style', 'display: block;');
-    //   document
-    //     .querySelectorAll('li#Follow')[0]
-    //     .setAttribute('style', 'display: none;');
-    // } else {
-    //   document
-    //     .querySelectorAll('li#Follow')[0]
-    //     .setAttribute('style', 'display: block;');
-    //   document
-    //     .querySelectorAll('li#Unfollow')[0]
-    //     .setAttribute('style', 'display: none;');
-    // }
-    // if (this.ocLevel >= 3 && !this.isLeader) {
-    //   if (users.includes(this.currentUser)) {
-    //     // document
-    //     //   .querySelectorAll('li#Add-Sub-Task')[0]
-    //     //   .setAttribute('style', 'display: none;');
-    //     // document
-    //     //   .querySelectorAll('li#EditTask')[0]
-    //     //   .setAttribute('style', 'display: none;');
-    //     // document
-    //     //   .querySelectorAll('li#DeleteTask')[0]
-    //     //   .setAttribute('style', 'display: none;');
-    //   } else {
-    //     this.alertify.warning('You are not assign this task!', true);
-    //   }
-    // }
   }
   contextMenuClick(args?: any): void {
     console.log('contextMenuClick', args);
@@ -403,36 +235,12 @@ export class RoutineComponent implements OnInit, OnDestroy {
 
     // this.taskId = data.ID;
     this.jobName = data.JobName;
-    this.tutorialName = data.JobName;
     this.srcTutorial = data.VideoLink;
     switch (args.item.id) {
-      case 'Add-Sub-Task':
-        this.parentId = data.ID;
-        this.openAddSubTaskModal();
-        break;
-      case 'Tutorial':
-        this.openTutorialModal(args);
-        break;
-      case 'EditTutorial':
-        this.openEditTutorialModal(args);
-        break;
-      case 'WatchVideo':
-        this.openWatchTutorialWatchModal();
-        break;
-      case 'EditTask':
-        this.openEditTaskModal(args);
-        break;
       case 'DeleteTask':
         this.deleteRoot();
         break;
     }
-  }
-  rowSelectedTask(args) {
-    if (args.isInteracted) {
-      this.rowSelectedTaskIndex = args.rowIndex;
-      this.itemDetailModal = args.data;
-    }
-    console.log('rowSelectedTask', args);
   }
   rowSelected(args?) {
     this.ocId = args.data.key;
@@ -445,21 +253,6 @@ export class RoutineComponent implements OnInit, OnDestroy {
     this.getTasks();
   }
   // end event
-  openRoutineDetailModal(arg) {
-    const modalRef = this.modalService.open(RoutineDetailComponent, { size: 'xl' });
-    modalRef.componentInstance.title = 'Routine Detail';
-    modalRef.componentInstance.tasks = arg;
-    modalRef.componentInstance.ocId = this.ocId;
-    this.itemDetailModal = arg;
-    this.showDetailModal = true;
-    modalRef.result.then((result) => {
-      console.log('openRoutineDetailModal', result);
-    }, (reason) => {
-        console.log('Close RoutineDetailModal');
-        this.showDetailModal = false;
-    });
-    this.jobtypeService.changeMessage(JobType.Routine);
-  }
   openAddMainTaskModal() {
     const modalRef = this.modalService.open(AddTaskModalComponent, { size: 'xl' });
     modalRef.componentInstance.title = 'Add Routine Main Task';
@@ -468,119 +261,7 @@ export class RoutineComponent implements OnInit, OnDestroy {
     modalRef.result.then((result) => {
       // console.log('openAddMainTaskModal', result)
     }, (reason) => {
-      this.showDetailModal = false;
     });
     this.jobtypeService.changeMessage(JobType.Routine);
-  }
-  openAddSubTaskModal() {
-    const modalRef = this.modalService.open(AddTaskModalComponent, { size: 'xl' });
-    modalRef.componentInstance.title = 'Add Routine Sub-Task';
-    modalRef.componentInstance.ocid = this.ocId;
-    modalRef.componentInstance.parentId = this.parentId;
-    modalRef.componentInstance.jobType = JobType.Routine;
-    modalRef.result.then((result) => {
-      // console.log('openAddSubTaskModal', result);
-    }, (reason) => {
-      this.showDetailModal = false;
-    });
-    this.jobtypeService.changeMessage(JobType.Routine);
-  }
-  openEditTaskModal(args) {
-    const modalRef = this.modalService.open(AddTaskModalComponent, { size: 'xl' });
-    modalRef.componentInstance.title = 'Edit Routine Task';
-    modalRef.componentInstance.ocid = this.ocId;
-    modalRef.componentInstance.edit = this.editTask(args);
-    modalRef.componentInstance.jobType = JobType.Routine;
-    modalRef.result.then((result) => {
-      // console.log('openEditTaskModal', result);
-    }, (reason) => {
-      this.parentId = 0;
-      this.showDetailModal = false;
-    });
-    this.jobtypeService.changeMessage(JobType.Routine);
-  }
-  openTutorialModal(args) {
-    const modalRef = this.modalService.open(TutorialModalComponent, { size: 'xl' });
-    modalRef.componentInstance.title = 'Add Tutorial Routine Task';
-    modalRef.componentInstance.taskId = this.taskId;
-    modalRef.componentInstance.ocid = this.ocId;
-    modalRef.componentInstance.jobType = JobType.Routine;
-    modalRef.componentInstance.jobname = args.rowInfo.rowData.Entity.JobName;
-    modalRef.result.then((result) => {
-      // console.log('openTutorialModal', result);
-    }, (reason) => {
-    });
-    this.jobtypeService.changeMessage(JobType.Routine);
-  }
-  openEditTutorialModal(args) {
-    const modalRef = this.modalService.open(TutorialModalComponent, { size: 'xl' });
-    modalRef.componentInstance.title = 'Edit Tutorial Routine Task';
-    modalRef.componentInstance.taskId = this.taskId;
-    modalRef.componentInstance.tutorialID = args.rowInfo.rowData.Entity.ID;
-    modalRef.componentInstance.jobType = JobType.Routine;
-    modalRef.componentInstance.ocid = this.ocId;
-    modalRef.componentInstance.jobname = args.rowInfo.rowData.Entity.JobName;
-    modalRef.result.then((result) => {
-      // console.log('openEditTutorialModal', result);
-    }, (reason) => {
-    });
-    this.jobtypeService.changeMessage(JobType.Routine);
-  }
-  openWatchTutorialWatchModal() {
-    const modalRef = this.modalService.open(WatchTutorialVideoComponent, { size: 'xl' });
-    modalRef.componentInstance.src = this.srcTutorial;
-    modalRef.componentInstance.name = this.tutorialName;
-    modalRef.result.then((result) => {
-      // console.log('openWatchTutorialWatchModal', result);
-    }, (reason) => {
-    });
-    this.jobtypeService.changeMessage(JobType.Routine);
-  }
-  openWatchTutorialWatchModalByButton(data) {
-    const modalRef = this.modalService.open(WatchTutorialVideoComponent, { size: 'xl' });
-    modalRef.componentInstance.src = data.VideoLink;
-    modalRef.componentInstance.name = data.JobName;
-    modalRef.result.then((result) => {
-      // console.log('openWatchTutorialWatchModal', result);
-    }, (reason) => {
-    });
-    this.jobtypeService.changeMessage(JobType.Routine);
-  }
-  recordDoubleClick(agrs?: any) {
-    this.openCommentModal(agrs);
-  }
-  openCommentModal(args) {
-    const modalRef = this.modalService.open(CommentComponent, { size: 'xl' });
-    modalRef.componentInstance.title = args.rowData.Entity.JobName;
-    modalRef.componentInstance.taskID = args.rowData.Entity.ID;
-    modalRef.componentInstance.clientRouter = ClientRouter.Routine;
-    modalRef.result.then((result) => {
-      // console.log('openCommentModal From Todolist', result);
-    }, (reason) => {
-    });
-  }
-
-  private editTask(args?): Task {
-    if ((args || null) === null) {
-      return null;
-    }
-    const data = args.rowInfo.rowData.Entity;
-    return new Task()
-      .create(
-        data.ID,
-        data.JobName,
-        data.PICs,
-        data.FromWho.ID,
-        data.ProjectID,
-        false,
-        data.PriorityID,
-        data.ParentID,
-        data.periodType,
-        data.ProjectID,
-        data.JobTypeID,
-        data.Deputies,
-        data.OCID,
-        data.DueDate
-      );
   }
 }

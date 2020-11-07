@@ -247,7 +247,7 @@ namespace Service.Implement
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch 
             {
                 return false;
             }

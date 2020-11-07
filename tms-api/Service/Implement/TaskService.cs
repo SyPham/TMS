@@ -480,7 +480,7 @@ namespace Service.Implement
                 }
                 return Tuple.Create(userListForHub, listNotify);
             }
-            catch (Exception ex)
+            catch 
             {
                 throw;
             }
@@ -532,7 +532,7 @@ namespace Service.Implement
                 }
                 return false;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
             }
@@ -655,7 +655,7 @@ namespace Service.Implement
                     return edit;
                 }
             }
-            catch (Exception ex)
+            catch
             {
                 return new Data.Models.Task();
             }
@@ -938,7 +938,7 @@ namespace Service.Implement
                 await _context.SaveChangesAsync();
                 return Tuple.Create(true, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
             }
-            catch (Exception ex)
+            catch
             {
                 return Tuple.Create(false, "", new object());
             }
@@ -1029,7 +1029,7 @@ namespace Service.Implement
                 }
                 return Tuple.Create(true, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
             }
-            catch (Exception ex)
+            catch 
             {
                 return Tuple.Create(false, "", new object());
             }
@@ -1149,7 +1149,7 @@ namespace Service.Implement
                     return Tuple.Create(edit, string.Join(",", listUsers.Distinct()), GetAlertDueDate());
                 }
             }
-            catch (Exception ex)
+            catch 
             {
                 return Tuple.Create(new Data.Models.Task(), "", new object());
             }
@@ -2001,7 +2001,7 @@ namespace Service.Implement
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch 
             {
                 return false;
             }
@@ -2336,7 +2336,7 @@ namespace Service.Implement
 
                 return tree;
             }
-            catch (Exception ex)
+            catch 
             {
                 return new List<HierarchyNode<TreeViewTask>>();
             }
@@ -2378,7 +2378,7 @@ namespace Service.Implement
 
                 return tree;
             }
-            catch (Exception ex)
+            catch 
             {
 
                 return new List<HierarchyNode<TreeViewTask>>();
@@ -2424,7 +2424,7 @@ namespace Service.Implement
                 tree = tree.Concat(itemWithOutParent).ToList();
                 return tree;
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<HierarchyNode<TreeViewTask>>();
                 throw;
@@ -2435,8 +2435,6 @@ namespace Service.Implement
         {
             try
             {
-                // var user = _context.Users.Find(userid);
-                // var model =await Notification();
                 var jobtype = Data.Enum.JobType.Routine;
                 if (ocid == 0)
                     return new List<RoutineViewModel>();
@@ -2471,18 +2469,18 @@ namespace Service.Implement
                 }).ToList();
                 return model;
             }
-            catch (Exception ex)
+            catch
             {
                 return new List<RoutineViewModel>();
                 throw;
             }
 
         }
-        public async Task<List<HierarchyNode<TreeViewTask>>> Abnormal(int ocid, string priority, int userid, string startDate, string endDate, string weekdays)
+        public async Task<List<AbnormalViewModel>> Abnormal(int ocid, string priority, int userid, string startDate, string endDate, string weekdays)
         {
             var jobtype = Data.Enum.JobType.Abnormal;
             if (ocid == 0)
-                return new List<HierarchyNode<TreeViewTask>>();
+                return new List<AbnormalViewModel>();
             var listTasks = GetAllTasks()
                     .Where(x => x.Status == false && x.JobTypeID.Equals(jobtype) && x.OCID == ocid)
                     .Where(x =>
@@ -2514,7 +2512,14 @@ namespace Service.Implement
             var itemWithOutParent = all.Where(x => !flatten.Select(a => a.Entity.ID).Contains(x.ID)).Select(x => new HierarchyNode<TreeViewTask>
             { Entity = x }).ToList();
             tree = tree.Concat(itemWithOutParent).ToList();
-            return tree;
+            var model = tree.GroupBy(x => new { x.Entity.TaskCode }).Select(x => new AbnormalViewModel
+            {
+                TaskCode = x.Key.TaskCode,
+                JobName = x.OrderBy(x => x.Entity.DueDate).FirstOrDefault().Entity.JobName,
+                From = x.FirstOrDefault().Entity.From,
+                Tasks = x.ToList()
+            }).ToList();
+            return model;
         }
         public async Task<List<HierarchyNode<TreeViewTask>>> ProjectDetail(string sort = "", string priority = "", int userid = 0, int? projectid = null)
         {
@@ -2574,7 +2579,7 @@ namespace Service.Implement
                 tree = tree.Concat(itemWithOutParent).ToList();
                 return tree;
             }
-            catch (Exception ex)
+            catch
             {
 
                 return new List<HierarchyNode<TreeViewTask>>();
@@ -2654,7 +2659,7 @@ namespace Service.Implement
                 tree = tree.Concat(itemWithOutParent).ToList();
                 return tree;
             }
-            catch (Exception ex)
+            catch 
             {
                 return null;
 
@@ -2733,7 +2738,7 @@ namespace Service.Implement
                 tree = tree.Concat(map).ToList();
                 return tree;
             }
-            catch (Exception ex)
+            catch 
             {
                 return null;
 
@@ -2755,7 +2760,7 @@ namespace Service.Implement
             this.disposed = true;
         }
 
-        public async Task<object> UpdateDueDateTime()
+        public Task<object> UpdateDueDateTime()
         {
             //var tasks = _context.Tasks.ToList();
             //tasks.ForEach(item =>
@@ -2774,11 +2779,16 @@ namespace Service.Implement
             throw new NotImplementedException();
         }
 
-        public async Task<object> RoutineChild(string taskCode)
+        public async Task<object> RoutineChild(string taskCode, int userid)
         {
             var model = await GetAllTasks().Where(x => x.Code.Equals(taskCode)).ToListAsync();
              var all = _mapper.Map<List<TreeViewTask>>(model).ToList();
-            return all;
+            all.ForEach(item =>
+              {
+                  item.Follow = item.Follows.Any(x => x.TaskID == item.ID && x.UserID == userid) ? "Yes" : "No";
+
+              });
+            return all.AsHierarchy(x => x.ID, x => x.ParentID).ToList();;
         }
     }
 }

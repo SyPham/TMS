@@ -16,6 +16,7 @@ namespace Service.Interface
         Task<bool> Update(User entity);
         Task<bool> Update(UpdateUserDto entity); 
         Task<bool> Delete(int id);
+        Task<bool> Delete(int id, int systemCodeID);
         Task<UserResetPasswordVM> ResetPassword(int id);
         Task<UserResetPasswordVM> ResetPassword(UserResetPasswordVM user);
         Task<bool> ChangePassword(int userId, string password);
@@ -24,6 +25,7 @@ namespace Service.Interface
         Task<List<string>> GetUsernames();
         Task<bool> UploapProfile(int id, byte[] image);
         Task<object> GetListUser();
+        Task<List<User>> GetUserBySystemID(int systemID);
         Task<bool> ChangeAvatar(int userid, string imagePath);
         Task<PagedList<ListViewModel>> GetAllPaging(int page, int pageSize, string keyword);
         Task<PagedList<ListViewModel>> GetAllPaging(int systemCode, int page, int pageSize, string keyword);

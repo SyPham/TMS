@@ -61,7 +61,7 @@ namespace Service.Implement
 
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
                 throw;
@@ -123,7 +123,7 @@ namespace Service.Implement
                 await _hubContext.Clients.Group(chat.RoomID.ToString()).SendAsync("ReceiveMessageGroup", chat.RoomID.ToInt());
                 return chat;
             }
-            catch (Exception ex)
+            catch 
             {
                 return new Chat();
                 throw;
@@ -131,7 +131,7 @@ namespace Service.Implement
             throw new NotImplementedException();
         }
 
-        public async Task<int> JoinGroup(int projectid)
+        public Task<int> JoinGroup(int projectid)
         {
             //if (!await _context.Projects.AnyAsync(x => x.ID.Equals(projectid)))
             //{

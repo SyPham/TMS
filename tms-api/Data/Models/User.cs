@@ -15,7 +15,9 @@ namespace Data.Models
         [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         public int ID { get; set; }
         public string Username { get; set; }
+        [JsonIgnore]
         public byte[] PasswordHash { get; set; }
+        [JsonIgnore]
         public byte[] PasswordSalt { get; set; }
         public int OCID { get; set; }
         public int LevelOC { get; set; }
@@ -30,6 +32,7 @@ namespace Data.Models
         public int DeleteBy { get; set; }
         public DateTime ModifyTime { get; set; }
         public virtual Role Role { get; set; }
+
         public virtual ICollection<NotificationDetail> NotificationDetails { get; set; }
         public virtual ICollection<Notification> Notifications { get; set; }
         public virtual ICollection<UserSystem> UserSystems { get; set; }
@@ -41,5 +44,8 @@ namespace Data.Models
         public virtual ICollection<Manager> Managers { get; set; }
         public virtual ICollection<Project> Projects { get; set; }
         public virtual ICollection<Task> Tasks { get; set; }
+
+        [JsonIgnore]
+        public List<RefreshToken> RefreshTokens { get; set; }
     }
 }

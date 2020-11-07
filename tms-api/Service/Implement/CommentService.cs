@@ -196,7 +196,7 @@ namespace Service.Implement
                 }
 
             }
-            catch (Exception ex)
+            catch
             {
                 return Tuple.Create(false, string.Empty, new Comment());
             }

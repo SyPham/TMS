@@ -10,13 +10,13 @@
 const lineConfig = {
   authorizeUrl: 'https://notify-bot.line.me/oauth/authorize',
   client_id: 'HF6qOCM9xL4lXFsqOLPzhJ',
-  redirect_uri: 'http://localhost:106/api/LineNotify/Callback',
+  redirect_uri: 'http://10.4.4.224:1066/api/LineNotify/Callback',
   state: 'NO_STATE',
 };
 // const lineConfig = {
 //   authorizeUrl: 'https://notify-bot.line.me/oauth/authorize',
 //   client_id: 'HF6qOCM9xL4lXFsqOLPzhJ',
-//   redirect_uri: 'http://localhost:1000/api/LineNotify/Callback',
+//   redirect_uri: 'http://10.4.4.224:1000/api/LineNotify/Callback',
 //   state: 'NO_STATE',
 // };
 const SYSTEM_CODE = 1;
@@ -24,16 +24,16 @@ export const environment = {
   production: false,
   // demo
   systemCode: SYSTEM_CODE,
-  imagePath: 'http://localhost:106/images/',
-  apiUrl: 'http://localhost:106/api/',
-  hub: 'http://localhost:106/working-management-hub',
+  imagePath: 'http://10.4.4.224:1066/images/',
+  apiUrl: 'http://10.4.4.224:1066/api/',
+  hub: 'http://10.4.4.224:1066/working-management-hub',
   // tslint:disable-next-line:max-line-length
   redirectLineAuthorize: `${lineConfig.authorizeUrl}?response_type=code&client_id=${lineConfig.client_id}&redirect_uri=${lineConfig.redirect_uri}&scope=notify&state=NO_STATE`
 
   // home
-  // imagePath: 'http://localhost:1000/images/',
-  // apiUrl: 'http://localhost:1000/api/',
-  // hub: 'http://localhost:1000/working-management-hub',
+  // imagePath: 'http://10.4.4.224:1000/images/',
+  // apiUrl: 'http://10.4.4.224:1000/api/',
+  // hub: 'http://10.4.4.224:1000/working-management-hub',
   // tslint:disable-next-line:max-line-length
   // redirectLineAuthorize: `${lineConfig.authorizeUrl}?response_type=code&client_id=${lineConfig.client_id}&redirect_uri=${lineConfig.redirect_uri}&scope=notify&state=NO_STATE`
 

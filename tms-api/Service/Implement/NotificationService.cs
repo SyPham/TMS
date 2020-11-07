@@ -70,7 +70,7 @@ namespace Service.Implement
                 await _context.SaveChangesAsync();
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 await _context.AddRangeAsync(new CheckTask { Function = entity.Message });
 

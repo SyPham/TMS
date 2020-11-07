@@ -1,7 +1,8 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { NgbModal } from '@ng-bootstrap/ng-bootstrap';
 import { FilterSettingsModel, TreeGridComponent } from '@syncfusion/ej2-angular-treegrid';
+import { Subscription } from 'rxjs';
 import { ClientRouter } from 'src/app/_core/enum/ClientRouter';
 import { JobType, PeriodType } from 'src/app/_core/enum/task.enum';
 import { AddTask } from 'src/app/_core/_model/add.task';
@@ -21,7 +22,7 @@ import { WatchTutorialVideoComponent } from '../watch-tutorial-video/watch-tutor
   templateUrl: './routine-child.component.html',
   styleUrls: ['./routine-child.component.css']
 })
-export class RoutineChildComponent implements OnInit {
+export class RoutineChildComponent implements OnInit, OnDestroy {
   taskCode: string;
   data: any;
   @ViewChild('treegridTasks')
@@ -44,13 +45,14 @@ export class RoutineChildComponent implements OnInit {
   searchSettings: object;
   ocID: any;
   ocId: any;
+  subscriptions: Subscription = new Subscription();
   constructor(private route: ActivatedRoute,
               private modalService: NgbModal,
               private addTaskService: AddTaskService,
               private jobtypeService: JobTypeService,
               private projectDetailService: ProjectDetailService,
               private alertify: AlertifyService,
-              private routineService: RoutineService) { 
+              private routineService: RoutineService) {
                 this.optionGridTree();
                 this.checkRole();
               }
@@ -60,6 +62,15 @@ export class RoutineChildComponent implements OnInit {
       this.taskCode = this.route.snapshot.paramMap.get('code');
       this.getData();
     });
+
+    this.subscriptions.add(this.addTaskService.currentMessage.subscribe((res: AddTask) => {
+      if (res.Jobtype === JobType.Routine) {
+        this.getData();
+      }
+    }));
+  }
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
   }
   getData() {
     this.routineService.routineChild(this.taskCode)
@@ -80,6 +91,32 @@ export class RoutineChildComponent implements OnInit {
       key: '',
       ignoreCase: true
     };
+  }
+  resolver() {
+    // $('#overlay').fadeIn();
+    this.route.data.subscribe(data => {
+      this.ocs = data.ocs;
+      // $('#overlay').fadeOut();
+      this.subscriptions.add(this.addTaskService.currentMessage.subscribe((res: AddTask) => {
+        if (res.Jobtype === JobType.Routine) {
+          this.ocId = res.OcId;
+          this.getData();
+        }
+      }));
+      this.onRouteChange();
+    });
+  }
+  onRouteChange() {
+    this.route.data.subscribe(data => {
+      const taskname = this.route.snapshot.paramMap.get('code');
+      this.searchSettings = {
+        hierarchyMode: 'Parent',
+        fields: ['Entity.JobName'],
+        operator: 'contains',
+        key: taskname || '',
+        ignoreCase: true
+      };
+    });
   }
   checkRole() {
     if (this.ocLevel >= 3 && !this.isLeader) {
@@ -130,12 +167,12 @@ export class RoutineChildComponent implements OnInit {
         // { text: 'Default columns', tooltipText: 'Show default columns', prefixIcon: 'e-add', id: 'DefaultColumns' },
       ];
       this.contextMenuItems = [
-        {
-          text: 'Add Sub-Task',
-          iconCss: ' e-icons e-add',
-          target: '.e-content',
-          id: 'Add-Sub-Task'
-        },
+        // {
+        //   text: 'Add Sub-Task',
+        //   iconCss: ' e-icons e-add',
+        //   target: '.e-content',
+        //   id: 'Add-Sub-Task'
+        // },
         {
           text: 'Edit',
           iconCss: ' e-icons e-edit',

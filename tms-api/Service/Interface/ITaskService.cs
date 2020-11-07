@@ -30,12 +30,12 @@ namespace Service.Interface
         Task<object> GetDeputies();
         Task<object> GetListUser(int userid, int projectid);
         Task<object> UpdateDueDateTime();
-        Task<object> RoutineChild(string taskCode);
+        Task<object> RoutineChild(string taskCode, int userid);
         Task<object> GetCodeLineAsync(string code, string state);
         Task<List<HierarchyNode<TreeViewTask>>> Todolist(string sort = "", string priority = "", int userid = 0, string startDate = "", string endDate = "", string weekdays = "", string monthly = "", string quarterly = "");
         Task<List<HierarchyNode<TreeViewTask>>> TodolistSortBy(string beAssigned, string assigned, int userid);
         Task<List<RoutineViewModel>> Routine(string sort, string priority, int userid, int ocid);
-        Task<List<HierarchyNode<TreeViewTask>>> Abnormal(int ocid, string priority, int userid, string startDate, string endDate, string weekdays);
+        Task<List<AbnormalViewModel>> Abnormal(int ocid, string priority, int userid, string startDate, string endDate, string weekdays);
         Task<List<HierarchyNode<TreeViewTask>>> ProjectDetail(string sort = "", string priority = "", int userid = 0, int? projectid = null);
         Task<List<HierarchyNode<TreeViewTask>>> Follow(string sort = "", string priority = "", int userid = 0);
         Task<List<HierarchyNode<TreeViewTaskForHistory>>> History(int userid, string start, string end);

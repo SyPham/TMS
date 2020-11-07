@@ -19,6 +19,7 @@ import { FollowResolver } from 'src/app/_core/_resolvers/follow.resolvers';
 import { AuthGuard } from 'src/app/_core/_guards/auth.guard';
 import { RoutineDetailComponent } from './modals/routine-detail/routine-detail.component';
 import { RoutineChildComponent } from './routine/routine-child/routine-child.component';
+import { AbnormalDetailComponent } from './abnormal/abnormal-detail/abnormal-detail.component';
 
 const routes: Routes = [
   {
@@ -105,6 +106,13 @@ const routes: Routes = [
         component: AbnormalComponent,
         data: {
           title: 'Abnormal'
+        }
+      },
+      {
+        path: 'routine/detail/:code',
+        component: AbnormalDetailComponent,
+        data: {
+          title: 'Rotine'
         }
       },
       {

@@ -51,7 +51,9 @@ export class AbnormalService {
       })
     );
   }
-
+  abnormalChild(taskCode) {
+    return this.http.get(`${this.baseUrl}Tasks/RoutineChild/${taskCode}`);
+  }
   getWho() {
     return this.http.get(`${this.baseUrl}Tasks/GetListUser/0`).pipe(
       map(response => {

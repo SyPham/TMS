@@ -2,7 +2,7 @@
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { NgxSpinnerModule } from "ngx-spinner";
+import { NgxSpinnerModule } from 'ngx-spinner';
 // Components Routing
 import { ClientRoutingModule } from './client-routing.module';
 import { TodolistComponent } from './todolist/todolist.component';
@@ -16,7 +16,7 @@ import { AbnormalComponent } from './abnormal/abnormal.component';
 import { ChatGroupComponent } from './chat-group/chat-group.component';
 import { HistoryComponent } from './history/history.component';
 import { FollowComponent } from './follow/follow.component';
-import { MultiSelectModule } from "@syncfusion/ej2-angular-dropdowns";
+import { MultiSelectModule } from '@syncfusion/ej2-angular-dropdowns';
 
 import { SparklineAllModule } from '@syncfusion/ej2-angular-charts';
 
@@ -58,6 +58,7 @@ import { DateInputsModule } from '@progress/kendo-angular-dateinputs';
 import { ContextMenuModule  } from '@syncfusion/ej2-angular-navigations';
 import { ClipboardModule } from 'ngx-clipboard';
 import { RoutineChildComponent } from './routine/routine-child/routine-child.component';
+import { AbnormalDetailComponent } from './abnormal/abnormal-detail/abnormal-detail.component';
 
 @NgModule({
   imports: [
@@ -117,6 +118,7 @@ import { RoutineChildComponent } from './routine/routine-child/routine-child.com
     TreeComponent,
     RoutineDetailComponent,
     RoutineChildComponent,
+    AbnormalDetailComponent,
   ],
   providers: [
     RoutineResolver
