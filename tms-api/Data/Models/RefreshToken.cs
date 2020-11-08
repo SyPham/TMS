@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using System.Text.Json.Serialization;
 
-namespace Data
+namespace Data.Models
 {
     [Owned]
     public class RefreshToken
@@ -16,7 +16,7 @@ namespace Data
 
         public string Token { get; set; }
         public DateTime Expires { get; set; }
-        public bool IsExpired => DateTime.UtcNow >= Expires;
+        public bool IsExpired => DateTime.Now >= Expires;
         public DateTime Created { get; set; }
         public string CreatedByIp { get; set; }
         public DateTime? Revoked { get; set; }

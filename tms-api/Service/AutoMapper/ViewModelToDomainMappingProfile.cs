@@ -1,5 +1,6 @@
 ﻿
 using AutoMapper;
+using Data.Dto;
 using Data.Extensions;
 using Data.Models;
 using Data.ViewModel;
@@ -9,7 +10,6 @@ using Data.ViewModel.Project;
 using Data.ViewModel.Task;
 using Data.ViewModel.Tutorial;
 using Data.ViewModel.User;
-using Service.Dto;
 using System;
 using System.Collections.Generic;
 using System.Text;

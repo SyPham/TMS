@@ -15,10 +15,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
-using Service.Dto;
+using Data.Dto;
 using Service.Helpers;
 using Service.Interface;
-
+using Data.Dto.Auth;
 
 namespace TMS.Controllers
 {
@@ -56,19 +56,18 @@ namespace TMS.Controllers
         //    var createdUser = await _authService.Register(user, userForRegisterDto.Password);
         //    return CreatedAtRoute("GetUser", new { controller = "User", id = createdUser.ID }, userForRegisterDto);
         //}
-
+        [AllowAnonymous]
         [HttpPost("login")]
         public async Task<IActionResult> Login([FromBody]UserForLoginDto userForLoginDto)
-        
         {
             var user = await _authService.FindByNameAsync(userForLoginDto.Username);
             if (user == null)
-                return NotFound();
+                return BadRequest($"Can not find {userForLoginDto.Username}");
 
             var result = await _authService
                 .Login(userForLoginDto.Username, userForLoginDto.Password);
             if (result == null)
-                return NotFound();
+                return BadRequest("Account or password are wrong!!!");
             var subscribeLine = new bool();
             if (!user.AccessTokenLineNotify.IsNullOrEmpty())
             {
@@ -92,6 +91,7 @@ namespace TMS.Controllers
                 //Menus = JsonConvert.SerializeObject(await _authService.GetMenusAsync(user.Role))
             };
             var token = GenerateJwtToken(result);
+            this.setTokenCookie(token);
             if (userForLoginDto.SystemCode == 0)
             {
                 return Ok(new
@@ -117,7 +117,7 @@ namespace TMS.Controllers
             });
 
         }
-        
+
         [HttpGet("GetSignInHistory")]
         public async Task<IActionResult> GetSignInHistory()
         {
@@ -218,7 +218,7 @@ namespace TMS.Controllers
             var tokenDescriptor = new SecurityTokenDescriptor
             {
                 Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
+                Expires = DateTime.Now.AddSeconds(30),
                 SigningCredentials = creds
             };
 
@@ -269,7 +269,6 @@ namespace TMS.Controllers
             _authService.ResetPassword(model);
             return Ok(new { message = "Password reset successful, you can now login" });
         }
-
 
         private void setTokenCookie(string token)
         {

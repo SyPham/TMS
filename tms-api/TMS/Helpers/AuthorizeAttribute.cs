@@ -14,12 +14,12 @@ namespace TMS.Helpers
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var account = (User)context.HttpContext.Items["Account"];
-            if (account == null)
-            {
-                // not logged in
-                context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
-            }
+            //var account = (User)context.HttpContext.Items["Account"];
+            //if (account == null)
+            //{
+            //    // not logged in
+            //    context.Result = new JsonResult(new { message = "Unauthorized" }) { StatusCode = StatusCodes.Status401Unauthorized };
+            //}
         }
         //private readonly IList<Role> _roles;
 

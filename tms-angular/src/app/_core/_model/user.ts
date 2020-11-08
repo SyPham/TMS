@@ -7,6 +7,7 @@ export interface User {
   OcLevel: number;
   Role: number;
   ListOcs: [];
+  jwtToken?: string;
 }
 export interface UserForLogin {
   username: string;

@@ -29,7 +29,7 @@ namespace TMS.Hub
                 var userid = user.ToInt();
                 return (await _context.Users.FirstOrDefaultAsync(x => x.ID.Equals(userid))).Username.ToTitleCase();
             }
-            catch (Exception ex)
+            catch
             {
                 return "Someone";
                 throw;
@@ -86,7 +86,7 @@ namespace TMS.Hub
                 }
                 return true;
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
                 throw;

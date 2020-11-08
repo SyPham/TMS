@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Service.Dto
+namespace Data.Dto
 {
     public class AvatarDto
     {

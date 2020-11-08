@@ -1,6 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
-import { NgModule } from '@angular/core';
+import { APP_INITIALIZER, NgModule } from '@angular/core';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { JwtModule } from '@auth0/angular-jwt';
@@ -56,6 +56,8 @@ import { AvatarModalComponent } from './views/layout/header/avatar-modal/avatar-
 import { PreviewModalComponent } from './views/layout/header/preview-modal/preview-modal.component';
 import { MaintenanceComponent} from './views/maintenance/maintenance.component';
 import { SidebarComponent} from './views/sidebar/sidebar.component';
+import { appInitializer } from './_core/_helper/app.initializer';
+import { CookieService } from 'ngx-cookie-service';
 @NgModule({
   declarations: [
     AppComponent,
@@ -98,6 +100,7 @@ import { SidebarComponent} from './views/sidebar/sidebar.component';
   ],
   providers: [
     AlertifyService,
+    CookieService,
     SignalrService,
     AuthGuard,
     NgxSpinnerService,
@@ -110,6 +113,7 @@ import { SidebarComponent} from './views/sidebar/sidebar.component';
     ProjectDetailResolver,
     RoleResolver,
     AuthService,
+    { provide: APP_INITIALIZER, useFactory: appInitializer, multi: true, deps: [AuthService] },
     { provide: HTTP_INTERCEPTORS, useClass: BasicAuthInterceptor, multi: true }
     // { provide: HTTP_INTERCEPTORS, multi: true }
   ],

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Data
+namespace Data.Dto.Auth
 {
     public class RevokeTokenRequest
     {

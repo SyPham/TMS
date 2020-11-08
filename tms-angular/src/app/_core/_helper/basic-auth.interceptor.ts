@@ -16,7 +16,6 @@ export class BasicAuthInterceptor implements HttpInterceptor {
                 }
             });
         }
-
         return next.handle(request);
     }
 }

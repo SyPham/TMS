@@ -24,9 +24,9 @@ export const environment = {
   production: false,
   // demo
   systemCode: SYSTEM_CODE,
-  imagePath: 'http://10.4.4.224:1066/images/',
-  apiUrl: 'http://10.4.4.224:1066/api/',
-  hub: 'http://10.4.4.224:1066/working-management-hub',
+  imagePath: 'http://localhost:1066/images/',
+  apiUrl: 'http://localhost:1066/api/',
+  hub: 'http://localhost:1066/working-management-hub',
   // tslint:disable-next-line:max-line-length
   redirectLineAuthorize: `${lineConfig.authorizeUrl}?response_type=code&client_id=${lineConfig.client_id}&redirect_uri=${lineConfig.redirect_uri}&scope=notify&state=NO_STATE`
 

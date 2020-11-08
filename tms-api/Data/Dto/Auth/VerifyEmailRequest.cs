@@ -3,12 +3,11 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Data
+namespace Data.Dto.Auth
 {
-    public class ForgotPasswordRequest
+    public class VerifyEmailRequest
     {
         [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public string Token { get; set; }
     }
 }

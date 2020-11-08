@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Data;
+using Data.Dto;
+using Data.Dto.Auth;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -25,15 +27,18 @@ namespace Service.Implement
         private readonly DataContext _context;
         private readonly IConfiguration _config;
         private readonly IEmailService _emailService;
+        private readonly IOCService _oCService;
         private readonly IMapper _mapper;
         public AuthService(
            DataContext context,
            IEmailService emailService,
+           IOCService oCService,
             IMapper mapper,
         IConfiguration config)
         {
             _context = context;
             _config = config;
+            _oCService = oCService;
             _emailService = emailService;
             _mapper = mapper;
         }
@@ -58,7 +63,39 @@ namespace Service.Implement
 
             if (!VerifyPasswordHash(password, user.PasswordHash, user.PasswordSalt))
                 return null;
+
             return user;
+        }
+        public AuthenticateResponse Authenticate(AuthenticateRequest model, string ipAddress)
+        {
+            var user = _context.Users.Include(x => x.UserSystems).SingleOrDefault(x => x.EmployeeID == model.Username);
+            if (!VerifyPasswordHash(model.Password, user.PasswordHash, user.PasswordSalt))
+                return null;
+            // return null if user not found
+            if (user == null) return null;
+
+            // authentication successful so generate jwt and refresh tokens
+            var jwtToken = generateJwtToken(user);
+            var refreshToken = generateRefreshToken(ipAddress);
+
+           // save refresh token
+            user.RefreshTokens.Add(refreshToken);
+            _context.Update(user);
+            _context.SaveChanges();
+            var userForReturn = new UserForReturnLogin
+            {
+                Username = user.Username,
+                Role = user.RoleID,
+                ID = user.ID,
+                OCLevel = user.LevelOC,
+                ListOCs = _oCService.ListOCIDofUser(user.OCID).GetAwaiter().GetResult(),
+                IsLeader = user.isLeader,
+                image = user.ImageBase64,
+                SubscribeLine = user.AccessTokenLineNotify.IsNullOrEmpty(),
+                Systems = user.UserSystems.Where(x => x.Status == true).Select(x => x.SystemID).ToList()
+            };
+
+            return new AuthenticateResponse(userForReturn, jwtToken, refreshToken.Token);
         }
         public async Task<Role> GetRolesAsync(int role)
         {
@@ -156,29 +193,11 @@ namespace Service.Implement
             return model;
         }
 
-        public AuthenticateResponse Authenticate(AuthenticateRequest model, string ipAddress)
-        {
-            var user = _context.Users.SingleOrDefault(x => x.EmployeeID == model.Username);
-            if (!VerifyPasswordHash(model.Password, user.PasswordHash, user.PasswordSalt))
-                return null;
-            // return null if user not found
-            if (user == null) return null;
 
-            // authentication successful so generate jwt and refresh tokens
-            var jwtToken = generateJwtToken(user);
-            var refreshToken = generateRefreshToken(ipAddress);
-
-            // save refresh token
-            user.RefreshTokens.Add(refreshToken);
-            _context.Update(user);
-            _context.SaveChanges();
-
-            return new AuthenticateResponse(user, jwtToken, refreshToken.Token);
-        }
 
         public AuthenticateResponse RefreshToken(string token, string ipAddress)
         {
-            var user = _context.Users.FirstOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
+            var user = _context.Users.Include(x=>x.UserSystems).FirstOrDefault(u => u.RefreshTokens.Any(t => t.Token == token));
 
             // return null if no user found with token
             if (user == null) return null;
@@ -196,11 +215,22 @@ namespace Service.Implement
             user.RefreshTokens.Add(newRefreshToken);
             _context.Update(user);
             _context.SaveChanges();
-
+            var userForReturn = new UserForReturnLogin
+            {
+                Username = user.Username,
+                Role = user.RoleID,
+                ID = user.ID,
+                OCLevel = user.LevelOC,
+                ListOCs = _oCService.ListOCIDofUser(user.OCID).GetAwaiter().GetResult(),
+                IsLeader = user.isLeader,
+                image = user.ImageBase64,
+                SubscribeLine = user.AccessTokenLineNotify.IsNullOrEmpty(),
+                Systems = user.UserSystems.Where(x => x.Status == true).Select(x => x.SystemID).ToList()
+            };
             // generate new jwt
             var jwtToken = generateJwtToken(user);
-
-            return new AuthenticateResponse(user, jwtToken, newRefreshToken.Token);
+            var oc = _oCService.ListOCIDofUser(user.OCID).GetAwaiter().GetResult();
+            return new AuthenticateResponse(userForReturn, jwtToken, refreshToken.Token);
         }
 
         public bool RevokeToken(string token, string ipAddress)
@@ -223,18 +253,28 @@ namespace Service.Implement
 
             return true;
         }
+        public enum ClaimTypeEnum
+        {
+            OCID,
+            Role
+        }
         private string generateJwtToken(User user)
         {
             var _appSettings = _config.GetSection("AppSettings").Get<AppSettings>();
             var tokenHandler = new JwtSecurityTokenHandler();
             var key = Encoding.ASCII.GetBytes(_appSettings.Token);
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.ID.ToString()),
+                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(ClaimTypeEnum.OCID.ToString(), user.OCID.ToSafetyString(),ClaimTypeEnum.OCID.ToString()),
+                new Claim(ClaimTypeEnum.Role.ToString(), user.RoleID.ToSafetyString(),ClaimTypeEnum.Role.ToString())
+
+            };
             var tokenDescriptor = new SecurityTokenDescriptor
             {
-                Subject = new ClaimsIdentity(new Claim[]
-                {
-                    new Claim(ClaimTypes.Name, user.ID.ToString())
-                }),
-                Expires = DateTime.UtcNow.AddMinutes(15),
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddMinutes(15),
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
             var token = tokenHandler.CreateToken(tokenDescriptor);

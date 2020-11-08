@@ -36,7 +36,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   userid: number;
   role: number;
   avatar: any;
-  currentUser = JSON.parse(localStorage.getItem('user')).User.ID;
+  currentUser = JSON.parse(localStorage.getItem('user')).ID;
   subscribeLine: boolean;
   subscription: Subscription;
   constructor(
@@ -63,17 +63,17 @@ export class HeaderComponent implements OnInit, OnDestroy {
     // this.checkServer();
     this.checkAlert();
     this.getAvatar();
-    this.role = JSON.parse(localStorage.getItem('user')).User.Role;
-    this.currentUser = JSON.parse(localStorage.getItem('user')).User.Username;
+    this.role = JSON.parse(localStorage.getItem('user')).Role;
+    this.currentUser = JSON.parse(localStorage.getItem('user')).Username;
     this.page = 1;
     this.pageSize = 10;
     // this.signalrService.startConnection();
-    this.userid = JSON.parse(localStorage.getItem('user')).User.ID;
+    this.userid = JSON.parse(localStorage.getItem('user')).ID;
     this.getNotifications();
     this.onService();
     this.receiveGroupNotification();
     this.onRouteChange();
-    this.subscribeLine = JSON.parse(localStorage.getItem('user')).User.SubscribeLine;
+    this.subscribeLine = JSON.parse(localStorage.getItem('user')).SubscribeLine;
     // // console.log('Demo Header---------------------------', signalr.CONNECTION_HUB);
   }
   ngOnDestroy() {
@@ -162,15 +162,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     this.currentTime = moment().format('LTS');
   }
   logout() {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('avatar');
-    this.authService.decodedToken = null;
-    this.authService.currentUser = null;
-    this.alertify.message('Logged out');
+    this.authService.logout();
     const uri = this.router.url;
-    this.router.navigate(['login'], { queryParams: { uri } });
-
+    this.router.navigate(['login'], { queryParams: { uri } }).then(() => this.alertify.message('Logged out'));
   }
   openAvatarModal() {
     const modalRef = this.modalService.open(AvatarModalComponent, { size: 'lg' });
@@ -183,7 +177,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   pushToMainPage() {
-    const role = JSON.parse(localStorage.getItem('user')).User.Role;
+    const role = JSON.parse(localStorage.getItem('user')).Role;
     if (role === 1) {
       this.router.navigate(['/admin/dash']);
     } else if (role === 2) {
@@ -191,7 +185,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
     }
   }
   checkServer() {
-    const user = JSON.parse(localStorage.getItem('user')).User.Username;
+    const user = JSON.parse(localStorage.getItem('user')).Username;
     this.intervalSignalr = setInterval(() => {
       if (signalr.CONNECTION_HUB.state) {
         // console.log(user + ' yeu cau server check alert');
@@ -205,8 +199,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
   checkAlert() {
     if (signalr.CONNECTION_HUB.state === 'Connected') {
-      const user = JSON.parse(localStorage.getItem('user')).User.Username;
-      const userId = JSON.parse(localStorage.getItem('user')).User.ID;
+      const user = JSON.parse(localStorage.getItem('user')).Username;
+      const userId = JSON.parse(localStorage.getItem('user')).ID;
       signalr.CONNECTION_HUB
         .invoke('CheckAlert', userId.toString())
         .catch((err) => {

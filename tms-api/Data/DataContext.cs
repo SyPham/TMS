@@ -63,7 +63,7 @@ namespace Data
                                 .WithOne(c => c.User)
                                 .OnDelete(DeleteBehavior.ClientCascade);
 
-          
+
             builder.Entity<User>()
                 .HasMany(u => u.Follows)
                 .WithOne(c => c.User)

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using AutoMapper.Configuration;
+using Data.Dto;
 using Data.Extensions;
 using Data.Models;
 using Data.ViewModel.Comment;
@@ -9,7 +10,6 @@ using Data.ViewModel.Project;
 using Data.ViewModel.Task;
 using Data.ViewModel.Tutorial;
 using Data.ViewModel.User;
-using Service.Dto;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,7 +19,7 @@ namespace Service.AutoMapper
 {
     public class DomainToViewModelMappingProfile : Profile
     {
-       
+
         public string CastPriority(string value)
         {
             value = value.ToSafetyString().ToUpper() ?? "";

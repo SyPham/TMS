@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using Data.Dto;
 using Data.Models;
 using Data.ViewModel.User;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Service.Dto;
 using Service.Helpers;
 using Service.Interface;
 using TMS.Helpers;
@@ -26,7 +26,7 @@ namespace TMS.Controllers
 
         private IHostingEnvironment _currentEnvironment;
         private IMailExtension _mailExtension;
-        public UsersController(IUserService userService, IMailExtension mailExtension,IHostingEnvironment currentEnvironment)
+        public UsersController(IUserService userService, IMailExtension mailExtension, IHostingEnvironment currentEnvironment)
         {
             _userService = userService;
             _currentEnvironment = currentEnvironment;
@@ -81,7 +81,7 @@ namespace TMS.Controllers
             }
             return Ok(await _userService.ChangeAvatar(userID, uniqueFileName));
         }
-        
+
          [HttpPut("{userId}/{password}")]
         public async Task<IActionResult> ChangePassword(int userId, string password)
         {
@@ -182,7 +182,7 @@ namespace TMS.Controllers
             await _mailExtension.SendEmailAsync(model.Email, "Reset Password", $"Password: {model.Password}");
             return Ok(model.Status);
         }
-        
+
         [HttpGet]
         public async Task<ActionResult> GetUsernames()
         {

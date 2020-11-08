@@ -3,19 +3,16 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Data
+namespace Data.Dto.Auth
 {
-    public class ResetPasswordRequest
+    public class AuthenticateRequest
     {
         [Required]
-        public string Token { get; set; }
+        public string Username { get; set; }
 
         [Required]
-        [MinLength(6)]
         public string Password { get; set; }
-
         [Required]
-        [Compare("Password")]
-        public string ConfirmPassword { get; set; }
+        public int SystemCode { get; set; }
     }
 }

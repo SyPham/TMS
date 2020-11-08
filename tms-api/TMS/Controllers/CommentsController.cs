@@ -104,12 +104,12 @@ namespace TMS.Controllers
                 return true;
 
             }
-            catch (Exception ex)
+            catch
             {
                 return false;
                 throw;
             }
-           
+
         }
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)

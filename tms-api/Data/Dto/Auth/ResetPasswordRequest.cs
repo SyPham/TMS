@@ -3,19 +3,12 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
-namespace Data
+namespace Data.Dto.Auth
 {
-    public class RegisterRequest
+    public class ResetPasswordRequest
     {
         [Required]
-        public string EmployeeID { get; set; }
-
-        [Required]
-        public string Username { get; set; }
-
-        [Required]
-        [EmailAddress]
-        public string Email { get; set; }
+        public string Token { get; set; }
 
         [Required]
         [MinLength(6)]
@@ -24,8 +17,5 @@ namespace Data
         [Required]
         [Compare("Password")]
         public string ConfirmPassword { get; set; }
-
-        [Range(typeof(bool), "true", "true")]
-        public bool AcceptTerms { get; set; }
     }
 }

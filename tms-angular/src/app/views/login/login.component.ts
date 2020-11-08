@@ -40,7 +40,7 @@ export class LoginComponent implements OnInit {
     // console.log(this.user);
     this.authService.login(this.user).subscribe(
       next => {
-        this.role = JSON.parse(localStorage.getItem('user')).User.Role;
+        this.role = JSON.parse(localStorage.getItem('user')).Role;
         this.alertifyService.success('Login Success!!');
         this.checkRole();
       },
@@ -77,10 +77,10 @@ export class LoginComponent implements OnInit {
         if (!this.checkRoute(uri)) {
           this.router.navigate([uri]);
         } else {
-          this.router.navigate(['/todolist']);
+          this.router.navigate(['/admin/dash']);
         }
       } else {
-        this.router.navigate(['/todolist']);
+        this.router.navigate(['/admin/dash']);
       }
     }
   }

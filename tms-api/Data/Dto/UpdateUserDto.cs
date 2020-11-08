@@ -1,6 +1,6 @@
 using System;
 
-namespace Service.Dto
+namespace Data.Dto
 {
     public class UpdateUserDto
     {

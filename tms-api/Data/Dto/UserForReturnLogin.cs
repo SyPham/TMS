@@ -2,9 +2,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace Service.Dto
+namespace Data.Dto
 {
     public class UserForReturnLogin
     {
@@ -18,6 +19,7 @@ namespace Service.Dto
         public bool IsLeader { get; set; }
         public bool SubscribeLine { get; set; }
         public string EmployeeID { get; set; }
+      
         public List<int> Systems { get; set; }
     }
 }

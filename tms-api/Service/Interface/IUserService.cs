@@ -1,6 +1,6 @@
-﻿using Data.Models;
+﻿using Data.Dto;
+using Data.Models;
 using Data.ViewModel.User;
-using Service.Dto;
 using Service.Helpers;
 using System;
 using System.Collections.Generic;
@@ -14,7 +14,7 @@ namespace Service.Interface
         Task<int> Create(UserViewModel entity);
         Task<bool> UpdateTokenLineForUser(string token, int userID);
         Task<bool> Update(User entity);
-        Task<bool> Update(UpdateUserDto entity); 
+        Task<bool> Update(UpdateUserDto entity);
         Task<bool> Delete(int id);
         Task<bool> Delete(int id, int systemCodeID);
         Task<UserResetPasswordVM> ResetPassword(int id);

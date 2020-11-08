@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace Service.Dto
+namespace Data.Dto
 {
     public class UserForRegisterDto
     {
